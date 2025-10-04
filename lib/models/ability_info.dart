@@ -1,13 +1,13 @@
 class AbilityInfo {
   const AbilityInfo({
-    this.abilityLevel,
+    required this.abilityLevel,
     required this.displayName,
     required this.id,
     required this.rawDescription,
     required this.rawDisplayName,
   });
 
-  final int? abilityLevel;
+  final int abilityLevel;
   final String displayName;
   final String id;
   final String rawDescription;
@@ -15,7 +15,7 @@ class AbilityInfo {
 
   factory AbilityInfo.fromJson(Map<String, dynamic> json) {
     return AbilityInfo(
-      abilityLevel: (json['abilityLevel'] as num?)?.toInt(),
+      abilityLevel: (json['abilityLevel'] as num?)?.toInt() ?? 0,
       displayName: (json['displayName'] as String?) ?? '',
       id: (json['id'] as String?) ?? '',
       rawDescription: (json['rawDescription'] as String?) ?? '',
@@ -24,7 +24,7 @@ class AbilityInfo {
   }
 
   Map<String, dynamic> toJson() => {
-        if (abilityLevel != null) 'abilityLevel': abilityLevel,
+        'abilityLevel': abilityLevel,
         'displayName': displayName,
         'id': id,
         'rawDescription': rawDescription,
