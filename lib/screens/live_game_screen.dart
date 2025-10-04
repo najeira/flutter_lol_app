@@ -1,160 +1,99 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/live_client_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LiveGameScreen extends StatefulWidget {
+import '../providers/live_game_providers.dart';
+
+class LiveGameScreen extends ConsumerWidget {
   const LiveGameScreen({super.key});
 
   @override
-  State<LiveGameScreen> createState() => _LiveGameScreenState();
-}
-
-class _LiveGameScreenState extends State<LiveGameScreen> {
-  final _service = LiveClientService();
-  Map<String, dynamic>? _gameStats; // basic game stats
-  List<dynamic>? _players; // all players
-  String? _activePlayerName;
-  Object? _error;
-  bool _loading = true;
-  Timer? _autoRefreshTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 5), (_) => _refreshSilently());
-  }
-
-  @override
-  void dispose() {
-    _autoRefreshTimer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _refreshSilently() async {
-    try {
-      final players = await _service.getPlayerList();
-      final stats = await _service.getGameStats();
-      final me = await _service.getActivePlayerName();
-      if (!mounted) return;
-      setState(() {
-        _players = players;
-        _gameStats = stats;
-        _activePlayerName = me;
-        _error = null;
-      });
-    } catch (_) {
-      // ignore background refresh errors
-    }
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final results = await Future.wait([
-        _service.getPlayerList(),
-        _service.getGameStats(),
-        _service.getActivePlayerName(),
-      ]);
-      if (!mounted) return;
-      setState(() {
-        _players = results[0] as List<dynamic>;
-        _gameStats = results[1] as Map<String, dynamic>;
-        _activePlayerName = results[2] as String?;
-        _loading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e;
-        _loading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final async = ref.watch(liveGameProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('LoL Live Game Helper'),
         actions: [
-          IconButton(onPressed: _load, icon: const Icon(Icons.refresh)),
+          IconButton(
+            onPressed: () => ref.read(liveGameProvider.notifier).refresh(),
+            icon: const Icon(Icons.refresh),
+          ),
         ],
       ),
-      body: _buildBody(theme),
-    );
-  }
-
-  Widget _buildBody(ThemeData theme) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return _ErrorView(error: _error!, onRetry: _load);
-    }
-    if (_players == null || _players!.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'ゲーム中のデータが見つかりません。\nLeague of Legends の対戦中にアプリを使用してください。',
-            textAlign: TextAlign.center,
-          ),
+      body: async.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => _ErrorView(
+          error: e,
+          onRetry: () => ref.read(liveGameProvider.notifier).refresh(),
         ),
-      );
-    }
-
-    final gameTime = _formatTime((_gameStats?['gameTime'] as num?)?.toDouble() ?? 0);
-
-    // Group players by team
-    final order = _players!.where((p) => (p['team'] ?? '').toString().toUpperCase() == 'ORDER').toList();
-    final chaos = _players!.where((p) => (p['team'] ?? '').toString().toUpperCase() == 'CHAOS').toList();
-
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '試合時間: $gameTime',
-                    style: theme.textTheme.titleMedium,
-                  ),
+        data: (data) {
+          final players = data?.players ?? const [];
+          if (players.isEmpty) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'ゲーム中のデータが見つかりません。\nLeague of Legends の対戦中にアプリを使用してください。',
+                  textAlign: TextAlign.center,
                 ),
-                if (_activePlayerName != null)
-                  Row(
+              ),
+            );
+          }
+
+          final gameTime = _formatTime(((data?.gameStats['gameTime'] as num?)?.toDouble()) ?? 0);
+
+          // Group players by team
+          final order = players
+              .where((p) => (p['team'] ?? '').toString().toUpperCase() == 'ORDER')
+              .toList();
+          final chaos = players
+              .where((p) => (p['team'] ?? '').toString().toUpperCase() == 'CHAOS')
+              .toList();
+
+          return RefreshIndicator(
+            onRefresh: () => ref.read(liveGameProvider.notifier).refresh(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
                     children: [
-                      const Icon(Icons.person, size: 18),
-                      const SizedBox(width: 6),
-                      Text(_activePlayerName!),
-                      IconButton(
-                        icon: const Icon(Icons.copy, size: 18),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: _activePlayerName!));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('名前をコピーしました')),
-                          );
-                        },
-                      )
+                      Expanded(
+                        child: Text(
+                          '試合時間: $gameTime',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ),
+                      if (data?.activePlayerName != null)
+                        Row(
+                          children: [
+                            const Icon(Icons.person, size: 18),
+                            const SizedBox(width: 6),
+                            Text(data!.activePlayerName!),
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 18),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: data.activePlayerName!));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('名前をコピーしました')),
+                                );
+                              },
+                            )
+                          ],
+                        ),
                     ],
                   ),
+                ),
+                _TeamSection(title: 'ORDER', players: order, me: data?.activePlayerName),
+                _TeamSection(title: 'CHAOS', players: chaos, me: data?.activePlayerName),
+                const SizedBox(height: 24),
               ],
             ),
-          ),
-          _TeamSection(title: 'ORDER', players: order, me: _activePlayerName),
-          _TeamSection(title: 'CHAOS', players: chaos, me: _activePlayerName),
-          const SizedBox(height: 24),
-        ],
+          );
+        },
       ),
     );
   }
