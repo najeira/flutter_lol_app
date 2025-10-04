@@ -2,74 +2,54 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/all_game_data.dart';
 import '../services/live_client_service.dart';
 
-/// DI: Service provider
-final liveClientServiceProvider = Provider<LiveClientService>((ref) {
-  return LiveClientService();
-});
+const _kRefreshInterval = Duration(seconds: 3);
 
-class LiveGameData {
-  LiveGameData({
-    required this.players,
-    required this.gameStats,
-    required this.activePlayerName,
-  });
+// Emits latest live game data by polling getAllGameData periodically.
+// Poll interval: 2 seconds.
+final gameDataProvider = StreamProvider.autoDispose<AllGameData>((ref) async* {
+  final controller = StreamController<AllGameData>();
+  Timer? timer;
 
-  final List<dynamic> players;
-  final Map<String, dynamic> gameStats;
-  final String? activePlayerName;
-}
-
-/// Manages fetching and periodic refreshing of live game data.
-class LiveGameNotifier extends AsyncNotifier<LiveGameData?> {
-  Timer? _timer;
-
-  @override
-  Future<LiveGameData?> build() async {
-    // Start periodic refresh
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      // silent background refresh; ignore errors
-      _refreshSilently();
-    });
-    ref.onDispose(() {
-      _timer?.cancel();
-    });
-
-    return _fetch();
+  Future<void> fetch() async {
+    await _fetch(controller);
   }
 
-  Future<LiveGameData?> _fetch() async {
-    final service = ref.read(liveClientServiceProvider);
-    final results = await Future.wait([
-      service.getPlayerList(),
-      service.getGameStats(),
-      service.getActivePlayerName(),
-    ]);
-    return LiveGameData(
-      players: results[0] as List<dynamic>,
-      gameStats: results[1] as Map<String, dynamic>,
-      activePlayerName: results[2] as String?,
-    );
-  }
-
-  Future<void> refresh() async {
-    // Expose manual refresh for pull-to-refresh and button
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(_fetch);
-  }
-
-  Future<void> _refreshSilently() async {
-    try {
-      final data = await _fetch();
-      // Do not show loading; just replace data.
-      state = AsyncData(data);
-    } catch (_) {
-      // ignore background refresh errors
+  Future<void> start() async {
+    if (timer == null) {
+      await fetch();
+      timer = Timer.periodic(_kRefreshInterval, (_) => fetch());
     }
   }
-}
 
-final liveGameProvider = AsyncNotifierProvider<LiveGameNotifier, LiveGameData?>(
-  LiveGameNotifier.new,
-);
+  // 初回開始
+  await start();
+
+  // 購読が無ければ停止
+  ref.onCancel(() {
+    timer?.cancel();
+    timer = null;
+  });
+
+  // 再購読で再開
+  ref.onResume(start);
+
+  ref.onDispose(() {
+    timer?.cancel();
+    timer = null;
+    controller.close();
+  });
+
+  yield* controller.stream;
+});
+
+Future<void> _fetch(StreamSink<AllGameData> sink) async {
+  try {
+    final data = await getAllGameData();
+    sink.add(AllGameData.fromJson(data));
+  } catch (e, st) {
+    sink.addError(e, st);
+  }
+}
