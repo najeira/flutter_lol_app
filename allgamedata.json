@@ -1,0 +1,340 @@
+{
+	"activePlayer": {
+		"abilities": {
+			"E": {
+				"abilityLevel": 1,
+				"displayName": "呪福の叫び",
+				"id": "BriarE",
+				"rawDescription": "GeneratedTip_Spell_BriarE_Description",
+				"rawDisplayName": "GeneratedTip_Spell_BriarE_DisplayName"
+			},
+			"Passive": {
+				"displayName": "真紅の呪い",
+				"id": "BriarP",
+				"rawDescription": "GeneratedTip_Passive_BriarP_Description",
+				"rawDisplayName": "GeneratedTip_Passive_BriarP_DisplayName"
+			},
+			"Q": {
+				"abilityLevel": 1,
+				"displayName": "ヘッドラッシュ",
+				"id": "BriarQ",
+				"rawDescription": "GeneratedTip_Spell_BriarQ_Description",
+				"rawDisplayName": "GeneratedTip_Spell_BriarQ_DisplayName"
+			},
+			"R": {
+				"abilityLevel": 1,
+				"displayName": "迫りくる死",
+				"id": "BriarR",
+				"rawDescription": "GeneratedTip_Spell_BriarR_Description",
+				"rawDisplayName": "GeneratedTip_Spell_BriarR_DisplayName"
+			},
+			"W": {
+				"abilityLevel": 4,
+				"displayName": "血の狂乱 / 衝動噛み",
+				"id": "BriarW",
+				"rawDescription": "GeneratedTip_Spell_BriarW_Description",
+				"rawDisplayName": "GeneratedTip_Spell_BriarW_DisplayName"
+			}
+		},
+		"championStats": {
+			"abilityHaste": 35.0,
+			"abilityPower": 0.0,
+			"armor": 100.3489990234375,
+			"armorPenetrationFlat": 0.0,
+			"armorPenetrationPercent": 1.0,
+			"attackDamage": 222.91250610351563,
+			"attackRange": 125.0,
+			"attackSpeed": 0.8961460590362549,
+			"bonusArmorPenetrationPercent": 1.0,
+			"bonusMagicPenetrationPercent": 1.0,
+			"critChance": 0.0,
+			"critDamage": 175.0,
+			"currentHealth": 1555.2750244140626,
+			"healShieldPower": 0.0,
+			"healthRegenRate": 0.0,
+			"lifeSteal": 0.10000000149011612,
+			"magicLethality": 0.0,
+			"magicPenetrationFlat": 0.0,
+			"magicPenetrationPercent": 1.0,
+			"magicResist": 41.9322509765625,
+			"maxHealth": 1555.2750244140626,
+			"moveSpeed": 510.5,
+			"omnivamp": 0.0,
+			"physicalLethality": 0.0,
+			"physicalVamp": 0.0,
+			"resourceMax": 0.0,
+			"resourceRegenRate": 0.0,
+			"resourceType": "DRAGONFURY",
+			"resourceValue": 0.0,
+			"spellVamp": 0.0,
+			"tenacity": 5.0
+		},
+		"currentGold": 550.0,
+		"fullRunes": {
+			"generalRunes": [
+				{
+					"displayName": "プレスアタック",
+					"id": 8005,
+					"rawDescription": "perk_tooltip_PressTheAttack",
+					"rawDisplayName": "perk_displayname_PressTheAttack"
+				},
+				{
+					"displayName": "凱旋",
+					"id": 9111,
+					"rawDescription": "perk_tooltip_9111",
+					"rawDisplayName": "perk_displayname_9111"
+				},
+				{
+					"displayName": "レジェンド: 迅速",
+					"id": 9104,
+					"rawDescription": "perk_tooltip_9104",
+					"rawDisplayName": "perk_displayname_9104"
+				},
+				{
+					"displayName": "最期の慈悲",
+					"id": 8014,
+					"rawDescription": "perk_tooltip_CoupDeGrace",
+					"rawDisplayName": "perk_displayname_CoupDeGrace"
+				},
+				{
+					"displayName": "宇宙の英知",
+					"id": 8347,
+					"rawDescription": "perk_tooltip_CosmicInsight",
+					"rawDisplayName": "perk_displayname_CosmicInsight"
+				},
+				{
+					"displayName": "魔法の靴",
+					"id": 8304,
+					"rawDescription": "perk_tooltip_MagicalFootwear",
+					"rawDisplayName": "perk_displayname_MagicalFootwear"
+				}
+			],
+			"keystone": {
+				"displayName": "プレスアタック",
+				"id": 8005,
+				"rawDescription": "perk_tooltip_PressTheAttack",
+				"rawDisplayName": "perk_displayname_PressTheAttack"
+			},
+			"primaryRuneTree": {
+				"displayName": "栄華",
+				"id": 8000,
+				"rawDescription": "perkstyle_tooltip_7201",
+				"rawDisplayName": "perkstyle_displayname_7201"
+			},
+			"secondaryRuneTree": {
+				"displayName": "天啓",
+				"id": 8300,
+				"rawDescription": "perkstyle_tooltip_7203",
+				"rawDisplayName": "perkstyle_displayname_7203"
+			},
+			"statRunes": [
+				{
+					"id": 5008,
+					"rawDescription": "perk_tooltip_StatModAdaptive"
+				},
+				{
+					"id": 5008,
+					"rawDescription": "perk_tooltip_StatModAdaptive"
+				},
+				{
+					"id": 5001,
+					"rawDescription": "perk_tooltip_StatModHealthScaling"
+				}
+			]
+		},
+		"level": 7,
+		"riotId": "ghost4#1010",
+		"riotIdGameName": "ghost4",
+		"riotIdTagLine": "1010",
+		"summonerName": "ghost4#1010",
+		"teamRelativeColors": true
+	},
+	"allPlayers": [
+		{
+			"championName": "ブライアー",
+			"isBot": false,
+			"isDead": false,
+			"items": [
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "モスストンパーの幼体",
+					"itemID": 1103,
+					"price": 450,
+					"rawDescription": "GeneratedTip_Item_1103_Description",
+					"rawDisplayName": "Item_1103_Name",
+					"slot": 0
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "ルインドキング ブレード",
+					"itemID": 3153,
+					"price": 725,
+					"rawDescription": "GeneratedTip_Item_3153_Description",
+					"rawDisplayName": "Item_3153_Name",
+					"slot": 1
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "ブラック クリーバー",
+					"itemID": 3071,
+					"price": 225,
+					"rawDescription": "GeneratedTip_Item_3071_Description",
+					"rawDisplayName": "Item_3071_Name",
+					"slot": 2
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "デス ダンス",
+					"itemID": 6333,
+					"price": 275,
+					"rawDescription": "GeneratedTip_Item_6333_Description",
+					"rawDisplayName": "Item_6333_Name",
+					"slot": 3
+				},
+				{
+					"canUse": true,
+					"consumable": false,
+					"count": 1,
+					"displayName": "ステルス ワード",
+					"itemID": 3340,
+					"price": 0,
+					"rawDescription": "GeneratedTip_Item_3340_Description",
+					"rawDisplayName": "Item_3340_Name",
+					"slot": 6
+				}
+			],
+			"level": 7,
+			"position": "NONE",
+			"rawChampionName": "game_character_displayname_Briar",
+			"rawSkinName": "game_character_skin_displayname_Briar_0",
+			"respawnTimer": 0.0,
+			"riotId": "ghost4#1010",
+			"riotIdGameName": "ghost4",
+			"riotIdTagLine": "1010",
+			"runes": {
+				"keystone": {
+					"displayName": "プレスアタック",
+					"id": 8005,
+					"rawDescription": "perk_tooltip_PressTheAttack",
+					"rawDisplayName": "perk_displayname_PressTheAttack"
+				},
+				"primaryRuneTree": {
+					"displayName": "栄華",
+					"id": 8000,
+					"rawDescription": "perkstyle_tooltip_7201",
+					"rawDisplayName": "perkstyle_displayname_7201"
+				},
+				"secondaryRuneTree": {
+					"displayName": "天啓",
+					"id": 8300,
+					"rawDescription": "perkstyle_tooltip_7203",
+					"rawDisplayName": "perkstyle_displayname_7203"
+				}
+			},
+			"scores": {
+				"assists": 0,
+				"creepScore": 0,
+				"deaths": 0,
+				"kills": 0,
+				"wardScore": 0.0
+			},
+			"skinID": 0,
+			"skinName": "",
+			"summonerName": "ghost4#1010",
+			"summonerSpells": {
+				"summonerSpellOne": {
+					"displayName": "フラッシュ",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+				},
+				"summonerSpellTwo": {
+					"displayName": "スマイト",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerSmite_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+				}
+			},
+			"team": "ORDER"
+		},
+		{
+			"championName": "ランブル",
+			"isBot": true,
+			"isDead": false,
+			"items": [],
+			"level": 1,
+			"position": "TOP",
+			"rawChampionName": "game_character_displayname_Rumble",
+			"rawSkinName": "game_character_skin_displayname_Rumble_0",
+			"respawnTimer": 0.0,
+			"riotId": "Rumble#BOT",
+			"riotIdGameName": "Rumble",
+			"riotIdTagLine": "BOT",
+			"runes": {
+				"keystone": {
+					"displayName": "秘儀の彗星",
+					"id": 8229,
+					"rawDescription": "perk_tooltip_ArcaneComet",
+					"rawDisplayName": "perk_displayname_ArcaneComet"
+				},
+				"primaryRuneTree": {
+					"displayName": "魔道",
+					"id": 8200,
+					"rawDescription": "perkstyle_tooltip_7202",
+					"rawDisplayName": "perkstyle_displayname_7202"
+				},
+				"secondaryRuneTree": {
+					"displayName": "覇道",
+					"id": 8100,
+					"rawDescription": "perkstyle_tooltip_7200",
+					"rawDisplayName": "perkstyle_displayname_7200"
+				}
+			},
+			"scores": {
+				"assists": 0,
+				"creepScore": 0,
+				"deaths": 0,
+				"kills": 0,
+				"wardScore": 0.0
+			},
+			"skinID": 0,
+			"skinName": "",
+			"summonerName": "ランブル（AI）",
+			"summonerSpells": {
+				"summonerSpellOne": {
+					"displayName": "フラッシュ",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+				},
+				"summonerSpellTwo": {
+					"displayName": "テレポート",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerTeleport_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+				}
+			},
+			"team": "CHAOS"
+		}
+	],
+	"events": {
+		"Events": [
+			{
+				"EventID": 0,
+				"EventName": "GameStart",
+				"EventTime": 0.008659455925226212
+			}
+		]
+	},
+	"gameData": {
+		"gameMode": "PRACTICETOOL",
+		"gameTime": 41.364253997802737,
+		"mapName": "Map11",
+		"mapNumber": 11,
+		"mapTerrain": "Default"
+	}
+}
