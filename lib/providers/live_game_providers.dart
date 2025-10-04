@@ -7,21 +7,37 @@ import '../services/live_client_service.dart';
 
 const _kRefreshInterval = Duration(seconds: 3);
 
-// Emits latest live game data by polling getAllGameData periodically.
-// Poll interval: 2 seconds.
+// Emits latest game data by polling getAllGameData periodically.
 final gameDataProvider = StreamProvider.autoDispose<AllGameData>((ref) async* {
   final controller = StreamController<AllGameData>();
+
+  // one-shot timer to schedule next tick after current finishes
   Timer? timer;
 
-  Future<void> fetch() async {
+  // whether the polling loop should continue
+  bool running = false;
+
+  Future<void> tick() async {
     await _fetch(controller);
+
+    // Schedule next tick only after the current one completes
+    if (running) {
+      timer?.cancel();
+      timer = Timer(_kRefreshInterval, tick);
+    }
   }
 
   Future<void> start() async {
-    if (timer == null) {
-      await fetch();
-      timer = Timer.periodic(_kRefreshInterval, (_) => fetch());
+    if (!running) {
+      running = true;
+      await tick();
     }
+  }
+
+  void stop() {
+    running = false;
+    timer?.cancel();
+    timer = null;
   }
 
   // 初回開始
@@ -29,27 +45,35 @@ final gameDataProvider = StreamProvider.autoDispose<AllGameData>((ref) async* {
 
   // 購読が無ければ停止
   ref.onCancel(() {
-    timer?.cancel();
-    timer = null;
+    stop();
   });
 
   // 再購読で再開
   ref.onResume(start);
 
   ref.onDispose(() {
-    timer?.cancel();
-    timer = null;
+    stop();
     controller.close();
   });
 
   yield* controller.stream;
 });
 
-Future<void> _fetch(StreamSink<AllGameData> sink) async {
+Future<void> _fetch(StreamController<AllGameData> controller) async {
+  // If the provider is disposed while a fetch is in-flight, the controller may be
+  // closed before we try to emit. Guard against adding to a closed controller.
+  if (controller.isClosed) {
+    return;
+  }
+
   try {
     final data = await getAllGameData();
-    sink.add(AllGameData.fromJson(data));
+    if (!controller.isClosed) {
+      controller.add(AllGameData.fromJson(data));
+    }
   } catch (e, st) {
-    sink.addError(e, st);
+    if (!controller.isClosed) {
+      controller.addError(e, st);
+    }
   }
 }
