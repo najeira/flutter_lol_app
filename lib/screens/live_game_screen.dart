@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/live_game_providers.dart';
+import '../models/all_game_data.dart';
+import '../models/player.dart';
 
 class LiveGameScreen extends ConsumerWidget {
   const LiveGameScreen({super.key});
@@ -10,14 +12,14 @@ class LiveGameScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final async = ref.watch(liveGameProvider);
+    final async = ref.watch(gameDataProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('LoL Live Game Helper'),
         actions: [
           IconButton(
-            onPressed: () => ref.read(liveGameProvider.notifier).refresh(),
+            onPressed: () => ref.invalidate(gameDataProvider),
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -26,10 +28,10 @@ class LiveGameScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _ErrorView(
           error: e,
-          onRetry: () => ref.read(liveGameProvider.notifier).refresh(),
+          onRetry: () => ref.invalidate(gameDataProvider),
         ),
-        data: (data) {
-          final players = data?.players ?? const [];
+        data: (AllGameData data) {
+          final players = data.allPlayers;
           if (players.isEmpty) {
             return const Center(
               child: Padding(
@@ -42,18 +44,23 @@ class LiveGameScreen extends ConsumerWidget {
             );
           }
 
-          final gameTime = _formatTime(((data?.gameStats['gameTime'] as num?)?.toDouble()) ?? 0);
+          final gameTime = _formatTime(data.gameData.gameTime);
+          final meName = data.activePlayer.riotIdGameName.isNotEmpty
+              ? data.activePlayer.riotIdGameName
+              : data.activePlayer.summonerName;
 
           // Group players by team
           final order = players
-              .where((p) => (p['team'] ?? '').toString().toUpperCase() == 'ORDER')
+              .where((p) => (p.team).toString().toUpperCase() == 'ORDER')
               .toList();
           final chaos = players
-              .where((p) => (p['team'] ?? '').toString().toUpperCase() == 'CHAOS')
+              .where((p) => (p.team).toString().toUpperCase() == 'CHAOS')
               .toList();
 
           return RefreshIndicator(
-            onRefresh: () => ref.read(liveGameProvider.notifier).refresh(),
+            onRefresh: () async {
+              await ref.refresh(gameDataProvider.future);
+            },
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -67,16 +74,16 @@ class LiveGameScreen extends ConsumerWidget {
                           style: theme.textTheme.titleMedium,
                         ),
                       ),
-                      if (data?.activePlayerName != null)
+                      if (meName.isNotEmpty)
                         Row(
                           children: [
                             const Icon(Icons.person, size: 18),
                             const SizedBox(width: 6),
-                            Text(data!.activePlayerName!),
+                            Text(meName),
                             IconButton(
                               icon: const Icon(Icons.copy, size: 18),
                               onPressed: () {
-                                Clipboard.setData(ClipboardData(text: data.activePlayerName!));
+                                Clipboard.setData(ClipboardData(text: meName));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('名前をコピーしました')),
                                 );
@@ -87,8 +94,8 @@ class LiveGameScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                _TeamSection(title: 'ORDER', players: order, me: data?.activePlayerName),
-                _TeamSection(title: 'CHAOS', players: chaos, me: data?.activePlayerName),
+                _TeamSection(title: 'ORDER', players: order, me: meName),
+                _TeamSection(title: 'CHAOS', players: chaos, me: meName),
                 const SizedBox(height: 24),
               ],
             ),
@@ -109,7 +116,7 @@ class _TeamSection extends StatelessWidget {
   const _TeamSection({required this.title, required this.players, required this.me});
 
   final String title;
-  final List<dynamic> players;
+  final List<Player> players;
   final String? me;
 
   @override
@@ -131,21 +138,22 @@ class _TeamSection extends StatelessWidget {
 class _PlayerTile extends StatelessWidget {
   const _PlayerTile({required this.player, required this.me});
 
-  final Map<String, dynamic> player;
+  final Player player;
   final String? me;
 
   @override
   Widget build(BuildContext context) {
-    final name = (player['riotId'] ?? player['summonerName'] ?? player['name'] ?? '').toString();
-    final champion = (player['championName'] ?? player['rawChampionName'] ?? '').toString().replaceAll('game_character_displayname_', '');
-    final scores = player['scores'] as Map<String, dynamic>?;
-    final k = (scores?['kills'] ?? 0) as num;
-    final d = (scores?['deaths'] ?? 0) as num;
-    final a = (scores?['assists'] ?? 0) as num;
-    final creepScore = (scores?['creepScore'] ?? 0) as num;
-    final level = (player['level'] ?? player['championStats']?['level'] ?? 0) as num;
-    final gold = (scores?['gold'] ?? 0) as num;
-    final isMe = me != null && (name == me || (player['summonerName']?.toString() ?? '') == me);
+    final String name = player.riotId.isNotEmpty ? player.riotId : (player.summonerName);
+    final String champion = (player.championName.isNotEmpty
+            ? player.championName
+            : player.rawChampionName)
+        .replaceAll('game_character_displayname_', '');
+    final k = player.scores.kills;
+    final d = player.scores.deaths;
+    final a = player.scores.assists;
+    final creepScore = player.scores.creepScore;
+    final level = player.level;
+    final bool isMe = me != null && (name == me || player.summonerName == me);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -154,7 +162,7 @@ class _PlayerTile extends StatelessWidget {
           child: Text(level.toString()),
         ),
         title: Text('$name${isMe ? ' (You)' : ''}'),
-        subtitle: Text('$champion  |  KDA: ${k.toInt()}/${d.toInt()}/${a.toInt()}  CS: ${creepScore.toInt()}  Gold: ${gold.toInt()}'),
+        subtitle: Text('$champion  |  KDA: $k/$d/$a  CS: $creepScore'),
       ),
     );
   }

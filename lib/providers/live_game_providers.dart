@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/all_game_data.dart';
@@ -72,6 +73,7 @@ Future<void> _fetch(StreamController<AllGameData> controller) async {
       controller.add(AllGameData.fromJson(data));
     }
   } catch (e, st) {
+    debugPrint(e.toString());
     if (!controller.isClosed) {
       controller.addError(e, st);
     }
