@@ -11,7 +11,7 @@ AllGameData allGameDataFromJsonString(String source) =>
     AllGameData.fromJson(json.decode(source) as Map<String, dynamic>);
 
 class AllGameData {
-  AllGameData({
+  const AllGameData({
     required this.activePlayer,
     required this.allPlayers,
     required this.events,
@@ -43,17 +43,17 @@ class AllGameData {
 }
 
 class ActivePlayer {
-  ActivePlayer({
+  const ActivePlayer({
     required this.abilities,
     required this.championStats,
     required this.currentGold,
     required this.fullRunes,
     required this.level,
-    this.riotId,
-    this.riotIdGameName,
-    this.riotIdTagLine,
-    this.summonerName,
-    this.teamRelativeColors,
+    required this.riotId,
+    required this.riotIdGameName,
+    required this.riotIdTagLine,
+    required this.summonerName,
+    required this.teamRelativeColors,
   });
 
   final Abilities abilities;
@@ -61,11 +61,11 @@ class ActivePlayer {
   final num currentGold;
   final FullRunes fullRunes;
   final int level;
-  final String? riotId;
-  final String? riotIdGameName;
-  final String? riotIdTagLine;
-  final String? summonerName;
-  final bool? teamRelativeColors;
+  final String riotId;
+  final String riotIdGameName;
+  final String riotIdTagLine;
+  final String summonerName;
+  final bool teamRelativeColors;
 
   factory ActivePlayer.fromJson(Map<String, dynamic> json) {
     return ActivePlayer(
@@ -74,11 +74,11 @@ class ActivePlayer {
       currentGold: (json['currentGold'] as num? ?? 0),
       fullRunes: FullRunes.fromJson(json['fullRunes'] as Map<String, dynamic>),
       level: (json['level'] as num? ?? 0).toInt(),
-      riotId: json['riotId'] as String?,
-      riotIdGameName: json['riotIdGameName'] as String?,
-      riotIdTagLine: json['riotIdTagLine'] as String?,
-      summonerName: json['summonerName'] as String?,
-      teamRelativeColors: json['teamRelativeColors'] as bool?,
+      riotId: (json['riotId'] as String?) ?? '',
+      riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
+      riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
+      summonerName: (json['summonerName'] as String?) ?? '',
+      teamRelativeColors: (json['teamRelativeColors'] as bool?) ?? false,
     );
   }
 
@@ -88,148 +88,152 @@ class ActivePlayer {
         'currentGold': currentGold,
         'fullRunes': fullRunes.toJson(),
         'level': level,
-        if (riotId != null) 'riotId': riotId,
-        if (riotIdGameName != null) 'riotIdGameName': riotIdGameName,
-        if (riotIdTagLine != null) 'riotIdTagLine': riotIdTagLine,
-        if (summonerName != null) 'summonerName': summonerName,
-        if (teamRelativeColors != null) 'teamRelativeColors': teamRelativeColors,
+        'riotId': riotId,
+        'riotIdGameName': riotIdGameName,
+        'riotIdTagLine': riotIdTagLine,
+        'summonerName': summonerName,
+        'teamRelativeColors': teamRelativeColors,
       };
 }
 
 class Abilities {
-  Abilities({this.q, this.w, this.e, this.r, this.passive});
+  const Abilities({
+    required this.q,
+    required this.w,
+    required this.e,
+    required this.r,
+    required this.passive,
+  });
 
-  AbilityInfo? q;
-  AbilityInfo? w;
-  AbilityInfo? e;
-  AbilityInfo? r;
-  AbilityInfo? passive;
+  final AbilityInfo q;
+  final AbilityInfo w;
+  final AbilityInfo e;
+  final AbilityInfo r;
+  final AbilityInfo passive;
 
   factory Abilities.fromJson(Map<String, dynamic> json) {
     // Keys could be uppercase Q/W/E/R or localized; we follow example.
     return Abilities(
-      q: json['Q'] != null ? AbilityInfo.fromJson(json['Q'] as Map<String, dynamic>) : null,
-      w: json['W'] != null ? AbilityInfo.fromJson(json['W'] as Map<String, dynamic>) : null,
-      e: json['E'] != null ? AbilityInfo.fromJson(json['E'] as Map<String, dynamic>) : null,
-      r: json['R'] != null ? AbilityInfo.fromJson(json['R'] as Map<String, dynamic>) : null,
-      passive: json['Passive'] != null
-          ? AbilityInfo.fromJson(json['Passive'] as Map<String, dynamic>)
-          : null,
+      q: AbilityInfo.fromJson((json['Q'] as Map<String, dynamic>? ?? const {})),
+      w: AbilityInfo.fromJson((json['W'] as Map<String, dynamic>? ?? const {})),
+      e: AbilityInfo.fromJson((json['E'] as Map<String, dynamic>? ?? const {})),
+      r: AbilityInfo.fromJson((json['R'] as Map<String, dynamic>? ?? const {})),
+      passive: AbilityInfo.fromJson((json['Passive'] as Map<String, dynamic>? ?? const {})),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        if (q != null) 'Q': q!.toJson(),
-        if (w != null) 'W': w!.toJson(),
-        if (e != null) 'E': e!.toJson(),
-        if (r != null) 'R': r!.toJson(),
-        if (passive != null) 'Passive': passive!.toJson(),
+        'Q': q.toJson(),
+        'W': w.toJson(),
+        'E': e.toJson(),
+        'R': r.toJson(),
+        'Passive': passive.toJson(),
       };
 }
 
 class AbilityInfo {
-  AbilityInfo({
+  const AbilityInfo({
     this.abilityLevel,
-    this.displayName,
-    this.id,
-    this.rawDescription,
-    this.rawDisplayName,
+    required this.displayName,
+    required this.id,
+    required this.rawDescription,
+    required this.rawDisplayName,
   });
 
-  int? abilityLevel;
-  String? displayName;
-  String? id;
-  String? rawDescription;
-  String? rawDisplayName;
+  final int? abilityLevel;
+  final String displayName;
+  final String id;
+  final String rawDescription;
+  final String rawDisplayName;
 
   factory AbilityInfo.fromJson(Map<String, dynamic> json) {
     return AbilityInfo(
       abilityLevel: (json['abilityLevel'] as num?)?.toInt(),
-      displayName: json['displayName'] as String?,
-      id: json['id'] as String?,
-      rawDescription: json['rawDescription'] as String?,
-      rawDisplayName: json['rawDisplayName'] as String?,
+      displayName: (json['displayName'] as String?) ?? '',
+      id: (json['id'] as String?) ?? '',
+      rawDescription: (json['rawDescription'] as String?) ?? '',
+      rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
         if (abilityLevel != null) 'abilityLevel': abilityLevel,
-        if (displayName != null) 'displayName': displayName,
-        if (id != null) 'id': id,
-        if (rawDescription != null) 'rawDescription': rawDescription,
-        if (rawDisplayName != null) 'rawDisplayName': rawDisplayName,
+        'displayName': displayName,
+        'id': id,
+        'rawDescription': rawDescription,
+        'rawDisplayName': rawDisplayName,
       };
 }
 
 class ChampionStats {
-  ChampionStats({
-    this.abilityHaste,
-    this.abilityPower,
-    this.armor,
-    this.armorPenetrationFlat,
-    this.armorPenetrationPercent,
-    this.attackDamage,
-    this.attackRange,
-    this.attackSpeed,
-    this.bonusArmorPenetrationPercent,
-    this.bonusMagicPenetrationPercent,
-    this.critChance,
-    this.critDamage,
-    this.currentHealth,
-    this.healShieldPower,
-    this.healthRegenRate,
-    this.lifeSteal,
-    this.magicLethality,
-    this.magicPenetrationFlat,
-    this.magicPenetrationPercent,
-    this.magicResist,
-    this.maxHealth,
-    this.moveSpeed,
-    this.omnivamp,
-    this.physicalLethality,
-    this.physicalVamp,
-    this.resourceMax,
-    this.resourceRegenRate,
-    this.resourceType,
-    this.resourceValue,
-    this.spellVamp,
-    this.tenacity,
+  const ChampionStats({
+    required this.abilityHaste,
+    required this.abilityPower,
+    required this.armor,
+    required this.armorPenetrationFlat,
+    required this.armorPenetrationPercent,
+    required this.attackDamage,
+    required this.attackRange,
+    required this.attackSpeed,
+    required this.bonusArmorPenetrationPercent,
+    required this.bonusMagicPenetrationPercent,
+    required this.critChance,
+    required this.critDamage,
+    required this.currentHealth,
+    required this.healShieldPower,
+    required this.healthRegenRate,
+    required this.lifeSteal,
+    required this.magicLethality,
+    required this.magicPenetrationFlat,
+    required this.magicPenetrationPercent,
+    required this.magicResist,
+    required this.maxHealth,
+    required this.moveSpeed,
+    required this.omnivamp,
+    required this.physicalLethality,
+    required this.physicalVamp,
+    required this.resourceMax,
+    required this.resourceRegenRate,
+    required this.resourceType,
+    required this.resourceValue,
+    required this.spellVamp,
+    required this.tenacity,
   });
 
-  double? abilityHaste;
-  double? abilityPower;
-  double? armor;
-  double? armorPenetrationFlat;
-  double? armorPenetrationPercent;
-  double? attackDamage;
-  double? attackRange;
-  double? attackSpeed;
-  double? bonusArmorPenetrationPercent;
-  double? bonusMagicPenetrationPercent;
-  double? critChance;
-  double? critDamage;
-  double? currentHealth;
-  double? healShieldPower;
-  double? healthRegenRate;
-  double? lifeSteal;
-  double? magicLethality;
-  double? magicPenetrationFlat;
-  double? magicPenetrationPercent;
-  double? magicResist;
-  double? maxHealth;
-  double? moveSpeed;
-  double? omnivamp;
-  double? physicalLethality;
-  double? physicalVamp;
-  double? resourceMax;
-  double? resourceRegenRate;
-  String? resourceType;
-  double? resourceValue;
-  double? spellVamp;
-  double? tenacity;
+  final double abilityHaste;
+  final double abilityPower;
+  final double armor;
+  final double armorPenetrationFlat;
+  final double armorPenetrationPercent;
+  final double attackDamage;
+  final double attackRange;
+  final double attackSpeed;
+  final double bonusArmorPenetrationPercent;
+  final double bonusMagicPenetrationPercent;
+  final double critChance;
+  final double critDamage;
+  final double currentHealth;
+  final double healShieldPower;
+  final double healthRegenRate;
+  final double lifeSteal;
+  final double magicLethality;
+  final double magicPenetrationFlat;
+  final double magicPenetrationPercent;
+  final double magicResist;
+  final double maxHealth;
+  final double moveSpeed;
+  final double omnivamp;
+  final double physicalLethality;
+  final double physicalVamp;
+  final double resourceMax;
+  final double resourceRegenRate;
+  final String resourceType;
+  final double resourceValue;
+  final double spellVamp;
+  final double tenacity;
 
   factory ChampionStats.fromJson(Map<String, dynamic> json) {
-    double? d(dynamic v) => (v is num) ? v.toDouble() : null;
+    double d(dynamic v) => (v is num) ? v.toDouble() : 0.0;
     return ChampionStats(
       abilityHaste: d(json['abilityHaste']),
       abilityPower: d(json['abilityPower']),
@@ -258,7 +262,7 @@ class ChampionStats {
       physicalVamp: d(json['physicalVamp']),
       resourceMax: d(json['resourceMax']),
       resourceRegenRate: d(json['resourceRegenRate']),
-      resourceType: json['resourceType'] as String?,
+      resourceType: (json['resourceType'] as String?) ?? '',
       resourceValue: d(json['resourceValue']),
       spellVamp: d(json['spellVamp']),
       tenacity: d(json['tenacity']),
@@ -266,44 +270,42 @@ class ChampionStats {
   }
 
   Map<String, dynamic> toJson() => {
-        if (abilityHaste != null) 'abilityHaste': abilityHaste,
-        if (abilityPower != null) 'abilityPower': abilityPower,
-        if (armor != null) 'armor': armor,
-        if (armorPenetrationFlat != null) 'armorPenetrationFlat': armorPenetrationFlat,
-        if (armorPenetrationPercent != null) 'armorPenetrationPercent': armorPenetrationPercent,
-        if (attackDamage != null) 'attackDamage': attackDamage,
-        if (attackRange != null) 'attackRange': attackRange,
-        if (attackSpeed != null) 'attackSpeed': attackSpeed,
-        if (bonusArmorPenetrationPercent != null)
-          'bonusArmorPenetrationPercent': bonusArmorPenetrationPercent,
-        if (bonusMagicPenetrationPercent != null)
-          'bonusMagicPenetrationPercent': bonusMagicPenetrationPercent,
-        if (critChance != null) 'critChance': critChance,
-        if (critDamage != null) 'critDamage': critDamage,
-        if (currentHealth != null) 'currentHealth': currentHealth,
-        if (healShieldPower != null) 'healShieldPower': healShieldPower,
-        if (healthRegenRate != null) 'healthRegenRate': healthRegenRate,
-        if (lifeSteal != null) 'lifeSteal': lifeSteal,
-        if (magicLethality != null) 'magicLethality': magicLethality,
-        if (magicPenetrationFlat != null) 'magicPenetrationFlat': magicPenetrationFlat,
-        if (magicPenetrationPercent != null) 'magicPenetrationPercent': magicPenetrationPercent,
-        if (magicResist != null) 'magicResist': magicResist,
-        if (maxHealth != null) 'maxHealth': maxHealth,
-        if (moveSpeed != null) 'moveSpeed': moveSpeed,
-        if (omnivamp != null) 'omnivamp': omnivamp,
-        if (physicalLethality != null) 'physicalLethality': physicalLethality,
-        if (physicalVamp != null) 'physicalVamp': physicalVamp,
-        if (resourceMax != null) 'resourceMax': resourceMax,
-        if (resourceRegenRate != null) 'resourceRegenRate': resourceRegenRate,
-        if (resourceType != null) 'resourceType': resourceType,
-        if (resourceValue != null) 'resourceValue': resourceValue,
-        if (spellVamp != null) 'spellVamp': spellVamp,
-        if (tenacity != null) 'tenacity': tenacity,
+        'abilityHaste': abilityHaste,
+        'abilityPower': abilityPower,
+        'armor': armor,
+        'armorPenetrationFlat': armorPenetrationFlat,
+        'armorPenetrationPercent': armorPenetrationPercent,
+        'attackDamage': attackDamage,
+        'attackRange': attackRange,
+        'attackSpeed': attackSpeed,
+        'bonusArmorPenetrationPercent': bonusArmorPenetrationPercent,
+        'bonusMagicPenetrationPercent': bonusMagicPenetrationPercent,
+        'critChance': critChance,
+        'critDamage': critDamage,
+        'currentHealth': currentHealth,
+        'healShieldPower': healShieldPower,
+        'healthRegenRate': healthRegenRate,
+        'lifeSteal': lifeSteal,
+        'magicLethality': magicLethality,
+        'magicPenetrationFlat': magicPenetrationFlat,
+        'magicPenetrationPercent': magicPenetrationPercent,
+        'magicResist': magicResist,
+        'maxHealth': maxHealth,
+        'moveSpeed': moveSpeed,
+        'omnivamp': omnivamp,
+        'physicalLethality': physicalLethality,
+        'physicalVamp': physicalVamp,
+        'resourceMax': resourceMax,
+        'resourceRegenRate': resourceRegenRate,
+        'resourceType': resourceType,
+        'resourceValue': resourceValue,
+        'spellVamp': spellVamp,
+        'tenacity': tenacity,
       };
 }
 
 class FullRunes {
-  FullRunes({
+  const FullRunes({
     required this.generalRunes,
     required this.keystone,
     required this.primaryRuneTree,
@@ -341,177 +343,171 @@ class FullRunes {
 }
 
 class Rune {
-  Rune({this.displayName, this.id, this.rawDescription, this.rawDisplayName});
+  const Rune({required this.displayName, required this.id, required this.rawDescription, required this.rawDisplayName});
 
-  String? displayName;
-  int? id;
-  String? rawDescription;
-  String? rawDisplayName;
+  final String displayName;
+  final int id;
+  final String rawDescription;
+  final String rawDisplayName;
 
   factory Rune.fromJson(Map<String, dynamic> json) => Rune(
-        displayName: json['displayName'] as String?,
-        id: (json['id'] as num?)?.toInt(),
-        rawDescription: json['rawDescription'] as String?,
-        rawDisplayName: json['rawDisplayName'] as String?,
+        displayName: (json['displayName'] as String?) ?? '',
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        rawDescription: (json['rawDescription'] as String?) ?? '',
+        rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
-        if (displayName != null) 'displayName': displayName,
-        if (id != null) 'id': id,
-        if (rawDescription != null) 'rawDescription': rawDescription,
-        if (rawDisplayName != null) 'rawDisplayName': rawDisplayName,
+        'displayName': displayName,
+        'id': id,
+        'rawDescription': rawDescription,
+        'rawDisplayName': rawDisplayName,
       };
 }
 
 class StatRune {
-  StatRune({this.id, this.rawDescription});
+  const StatRune({required this.id, required this.rawDescription});
 
-  int? id;
-  String? rawDescription;
+  final int id;
+  final String rawDescription;
 
   factory StatRune.fromJson(Map<String, dynamic> json) => StatRune(
-        id: (json['id'] as num?)?.toInt(),
-        rawDescription: json['rawDescription'] as String?,
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        rawDescription: (json['rawDescription'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
-        if (id != null) 'id': id,
-        if (rawDescription != null) 'rawDescription': rawDescription,
+        'id': id,
+        'rawDescription': rawDescription,
       };
 }
 
 class Player {
-  Player({
-    this.championName,
+  const Player({
+    required this.championName,
     required this.isBot,
     required this.isDead,
     required this.items,
     required this.level,
-    this.position,
-    this.rawChampionName,
-    this.rawSkinName,
-    this.respawnTimer,
-    this.riotId,
-    this.riotIdGameName,
-    this.riotIdTagLine,
-    this.runes,
-    this.scores,
-    this.skinID,
-    this.skinName,
-    this.summonerName,
-    this.summonerSpells,
-    this.team,
+    required this.position,
+    required this.rawChampionName,
+    required this.rawSkinName,
+    required this.respawnTimer,
+    required this.riotId,
+    required this.riotIdGameName,
+    required this.riotIdTagLine,
+    required this.runes,
+    required this.scores,
+    required this.skinID,
+    required this.skinName,
+    required this.summonerName,
+    required this.summonerSpells,
+    required this.team,
   });
 
-  String? championName;
-  bool isBot;
-  bool isDead;
-  List<Item> items;
-  int level;
-  String? position;
-  String? rawChampionName;
-  String? rawSkinName;
-  double? respawnTimer;
-  String? riotId;
-  String? riotIdGameName;
-  String? riotIdTagLine;
-  SimpleRunes? runes;
-  Scores? scores;
-  int? skinID;
-  String? skinName;
-  String? summonerName;
-  SummonerSpells? summonerSpells;
-  String? team;
+  final String championName;
+  final bool isBot;
+  final bool isDead;
+  final List<Item> items;
+  final int level;
+  final String position;
+  final String rawChampionName;
+  final String rawSkinName;
+  final double respawnTimer;
+  final String riotId;
+  final String riotIdGameName;
+  final String riotIdTagLine;
+  final SimpleRunes runes;
+  final Scores scores;
+  final int skinID;
+  final String skinName;
+  final String summonerName;
+  final SummonerSpells summonerSpells;
+  final String team;
 
   factory Player.fromJson(Map<String, dynamic> json) => Player(
-        championName: json['championName'] as String?,
+        championName: (json['championName'] as String?) ?? '',
         isBot: (json['isBot'] as bool? ?? false),
         isDead: (json['isDead'] as bool? ?? false),
         items: (json['items'] as List<dynamic>? ?? const [])
             .map((e) => Item.fromJson(e as Map<String, dynamic>))
             .toList(),
-        level: (json['level'] as num? ?? 0).toInt(),
-        position: json['position'] as String?,
-        rawChampionName: json['rawChampionName'] as String?,
-        rawSkinName: json['rawSkinName'] as String?,
+        level: (json['level'] as num?)?.toInt() ?? 0,
+        position: (json['position'] as String?) ?? '',
+        rawChampionName: (json['rawChampionName'] as String?) ?? '',
+        rawSkinName: (json['rawSkinName'] as String?) ?? '',
         respawnTimer: (json['respawnTimer'] is num)
             ? (json['respawnTimer'] as num).toDouble()
-            : null,
-        riotId: json['riotId'] as String?,
-        riotIdGameName: json['riotIdGameName'] as String?,
-        riotIdTagLine: json['riotIdTagLine'] as String?,
-        runes: json['runes'] != null
-            ? SimpleRunes.fromJson(json['runes'] as Map<String, dynamic>)
-            : null,
-        scores: json['scores'] != null
-            ? Scores.fromJson(json['scores'] as Map<String, dynamic>)
-            : null,
-        skinID: (json['skinID'] as num?)?.toInt(),
-        skinName: json['skinName'] as String?,
-        summonerName: json['summonerName'] as String?,
-        summonerSpells: json['summonerSpells'] != null
-            ? SummonerSpells.fromJson(
-                json['summonerSpells'] as Map<String, dynamic>,
-              )
-            : null,
-        team: json['team'] as String?,
+            : 0.0,
+        riotId: (json['riotId'] as String?) ?? '',
+        riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
+        riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
+        runes: SimpleRunes.fromJson(json['runes'] as Map<String, dynamic>),
+        scores: Scores.fromJson(json['scores'] as Map<String, dynamic>),
+        skinID: (json['skinID'] as num?)?.toInt() ?? 0,
+        skinName: (json['skinName'] as String?) ?? '',
+        summonerName: (json['summonerName'] as String?) ?? '',
+        summonerSpells: SummonerSpells.fromJson(
+          json['summonerSpells'] as Map<String, dynamic>,
+        ),
+        team: (json['team'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
-        if (championName != null) 'championName': championName,
+        'championName': championName,
         'isBot': isBot,
         'isDead': isDead,
         'items': items.map((e) => e.toJson()).toList(),
         'level': level,
-        if (position != null) 'position': position,
-        if (rawChampionName != null) 'rawChampionName': rawChampionName,
-        if (rawSkinName != null) 'rawSkinName': rawSkinName,
-        if (respawnTimer != null) 'respawnTimer': respawnTimer,
-        if (riotId != null) 'riotId': riotId,
-        if (riotIdGameName != null) 'riotIdGameName': riotIdGameName,
-        if (riotIdTagLine != null) 'riotIdTagLine': riotIdTagLine,
-        if (runes != null) 'runes': runes!.toJson(),
-        if (scores != null) 'scores': scores!.toJson(),
-        if (skinID != null) 'skinID': skinID,
-        if (skinName != null) 'skinName': skinName,
-        if (summonerName != null) 'summonerName': summonerName,
-        if (summonerSpells != null) 'summonerSpells': summonerSpells!.toJson(),
-        if (team != null) 'team': team,
+        'position': position,
+        'rawChampionName': rawChampionName,
+        'rawSkinName': rawSkinName,
+        'respawnTimer': respawnTimer,
+        'riotId': riotId,
+        'riotIdGameName': riotIdGameName,
+        'riotIdTagLine': riotIdTagLine,
+        'runes': runes.toJson(),
+        'scores': scores.toJson(),
+        'skinID': skinID,
+        'skinName': skinName,
+        'summonerName': summonerName,
+        'summonerSpells': summonerSpells.toJson(),
+        'team': team,
       };
 }
 
 class Item {
-  Item({
+  const Item({
     required this.canUse,
     required this.consumable,
     required this.count,
-    this.displayName,
+    required this.displayName,
     required this.itemID,
     required this.price,
-    this.rawDescription,
-    this.rawDisplayName,
+    required this.rawDescription,
+    required this.rawDisplayName,
     required this.slot,
   });
 
-  bool canUse;
-  bool consumable;
-  int count;
-  String? displayName;
-  int itemID;
-  int price;
-  String? rawDescription;
-  String? rawDisplayName;
-  int slot;
+  final bool canUse;
+  final bool consumable;
+  final int count;
+  final String displayName;
+  final int itemID;
+  final int price;
+  final String rawDescription;
+  final String rawDisplayName;
+  final int slot;
 
   factory Item.fromJson(Map<String, dynamic> json) => Item(
         canUse: (json['canUse'] as bool? ?? false),
         consumable: (json['consumable'] as bool? ?? false),
         count: (json['count'] as num? ?? 0).toInt(),
-        displayName: json['displayName'] as String?,
-        itemID: (json['itemID'] as num? ?? 0).toInt(),
-        price: (json['price'] as num? ?? 0).toInt(),
-        rawDescription: json['rawDescription'] as String?,
-        rawDisplayName: json['rawDisplayName'] as String?,
+        displayName: (json['displayName'] as String?) ?? '',
+        itemID: (json['itemID'] as num?)?.toInt() ?? 0,
+        price: (json['price'] as num?)?.toInt() ?? 0,
+        rawDescription: (json['rawDescription'] as String?) ?? '',
+        rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
         slot: (json['slot'] as num? ?? 0).toInt(),
       );
 
@@ -519,17 +515,17 @@ class Item {
         'canUse': canUse,
         'consumable': consumable,
         'count': count,
-        if (displayName != null) 'displayName': displayName,
+        'displayName': displayName,
         'itemID': itemID,
         'price': price,
-        if (rawDescription != null) 'rawDescription': rawDescription,
-        if (rawDisplayName != null) 'rawDisplayName': rawDisplayName,
+        'rawDescription': rawDescription,
+        'rawDisplayName': rawDisplayName,
         'slot': slot,
       };
 }
 
 class SimpleRunes {
-  SimpleRunes({
+  const SimpleRunes({
     required this.keystone,
     required this.primaryRuneTree,
     required this.secondaryRuneTree,
@@ -555,35 +551,40 @@ class SimpleRunes {
 }
 
 class Scores {
-  Scores({this.assists, this.creepScore, this.deaths, this.kills, this.wardScore});
+  const Scores({
+    required this.assists,
+    required this.creepScore,
+    required this.deaths,
+    required this.kills,
+    required this.wardScore,
+  });
 
-  int? assists;
-  int? creepScore;
-  int? deaths;
-  int? kills;
-  double? wardScore;
+  final int assists;
+  final int creepScore;
+  final int deaths;
+  final int kills;
+  final double wardScore;
 
   factory Scores.fromJson(Map<String, dynamic> json) => Scores(
-        assists: (json['assists'] as num?)?.toInt(),
-        creepScore: (json['creepScore'] as num?)?.toInt(),
-        deaths: (json['deaths'] as num?)?.toInt(),
-        kills: (json['kills'] as num?)?.toInt(),
-        wardScore: (json['wardScore'] is num)
-            ? (json['wardScore'] as num).toDouble()
-            : null,
+        assists: (json['assists'] as num?)?.toInt() ?? 0,
+        creepScore: (json['creepScore'] as num?)?.toInt() ?? 0,
+        deaths: (json['deaths'] as num?)?.toInt() ?? 0,
+        kills: (json['kills'] as num?)?.toInt() ?? 0,
+        wardScore:
+            (json['wardScore'] is num) ? (json['wardScore'] as num).toDouble() : 0.0,
       );
 
   Map<String, dynamic> toJson() => {
-        if (assists != null) 'assists': assists,
-        if (creepScore != null) 'creepScore': creepScore,
-        if (deaths != null) 'deaths': deaths,
-        if (kills != null) 'kills': kills,
-        if (wardScore != null) 'wardScore': wardScore,
+        'assists': assists,
+        'creepScore': creepScore,
+        'deaths': deaths,
+        'kills': kills,
+        'wardScore': wardScore,
       };
 }
 
 class SummonerSpells {
-  SummonerSpells({required this.summonerSpellOne, required this.summonerSpellTwo});
+  const SummonerSpells({required this.summonerSpellOne, required this.summonerSpellTwo});
 
   final SummonerSpell summonerSpellOne;
   final SummonerSpell summonerSpellTwo;
@@ -602,27 +603,27 @@ class SummonerSpells {
 }
 
 class SummonerSpell {
-  SummonerSpell({this.displayName, this.rawDescription, this.rawDisplayName});
+  const SummonerSpell({required this.displayName, required this.rawDescription, required this.rawDisplayName});
 
-  String? displayName;
-  String? rawDescription;
-  String? rawDisplayName;
+  final String displayName;
+  final String rawDescription;
+  final String rawDisplayName;
 
   factory SummonerSpell.fromJson(Map<String, dynamic> json) => SummonerSpell(
-        displayName: json['displayName'] as String?,
-        rawDescription: json['rawDescription'] as String?,
-        rawDisplayName: json['rawDisplayName'] as String?,
+        displayName: (json['displayName'] as String?) ?? '',
+        rawDescription: (json['rawDescription'] as String?) ?? '',
+        rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
-        if (displayName != null) 'displayName': displayName,
-        if (rawDescription != null) 'rawDescription': rawDescription,
-        if (rawDisplayName != null) 'rawDisplayName': rawDisplayName,
+        'displayName': displayName,
+        'rawDescription': rawDescription,
+        'rawDisplayName': rawDisplayName,
       };
 }
 
 class LiveEvents {
-  LiveEvents({required this.events});
+  const LiveEvents({required this.events});
 
   final List<GameEvent> events;
 
@@ -638,49 +639,50 @@ class LiveEvents {
 }
 
 class GameEvent {
-  GameEvent({this.eventID, this.eventName, this.eventTime});
+  const GameEvent({required this.eventID, required this.eventName, required this.eventTime});
 
-  int? eventID;
-  String? eventName;
-  double? eventTime;
+  final int eventID;
+  final String eventName;
+  final double eventTime;
 
   factory GameEvent.fromJson(Map<String, dynamic> json) => GameEvent(
-        eventID: (json['EventID'] as num?)?.toInt(),
-        eventName: json['EventName'] as String?,
+        eventID: (json['EventID'] as num?)?.toInt() ?? 0,
+        eventName: (json['EventName'] as String?) ?? '',
         eventTime: (json['EventTime'] is num)
             ? (json['EventTime'] as num).toDouble()
-            : null,
+            : 0.0,
       );
 
   Map<String, dynamic> toJson() => {
-        if (eventID != null) 'EventID': eventID,
-        if (eventName != null) 'EventName': eventName,
-        if (eventTime != null) 'EventTime': eventTime,
+        'EventID': eventID,
+        'EventName': eventName,
+        'EventTime': eventTime,
       };
 }
 
 class GameData {
-  GameData({this.gameMode, this.gameTime, this.mapName, this.mapNumber, this.mapTerrain});
+  const GameData({required this.gameMode, required this.gameTime, required this.mapName, required this.mapNumber, required this.mapTerrain});
 
-  String? gameMode;
-  double? gameTime;
-  String? mapName;
-  int? mapNumber;
-  String? mapTerrain;
+  final String gameMode;
+  final double gameTime;
+  final String mapName;
+  final int mapNumber;
+  final String mapTerrain;
 
   factory GameData.fromJson(Map<String, dynamic> json) => GameData(
-        gameMode: json['gameMode'] as String?,
-        gameTime: (json['gameTime'] is num) ? (json['gameTime'] as num).toDouble() : null,
-        mapName: json['mapName'] as String?,
-        mapNumber: (json['mapNumber'] as num?)?.toInt(),
-        mapTerrain: json['mapTerrain'] as String?,
+        gameMode: (json['gameMode'] as String?) ?? '',
+        gameTime:
+            (json['gameTime'] is num) ? (json['gameTime'] as num).toDouble() : 0.0,
+        mapName: (json['mapName'] as String?) ?? '',
+        mapNumber: (json['mapNumber'] as num?)?.toInt() ?? 0,
+        mapTerrain: (json['mapTerrain'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
-        if (gameMode != null) 'gameMode': gameMode,
-        if (gameTime != null) 'gameTime': gameTime,
-        if (mapName != null) 'mapName': mapName,
-        if (mapNumber != null) 'mapNumber': mapNumber,
-        if (mapTerrain != null) 'mapTerrain': mapTerrain,
+        'gameMode': gameMode,
+        'gameTime': gameTime,
+        'mapName': mapName,
+        'mapNumber': mapNumber,
+        'mapTerrain': mapTerrain,
       };
 }
