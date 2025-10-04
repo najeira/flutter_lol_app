@@ -37,7 +37,8 @@ class LiveGameScreen extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
-                  'ゲーム中のデータが見つかりません。\nLeague of Legends の対戦中にアプリを使用してください。',
+                  'ゲーム中のデータが見つかりません。\n'
+                  'League of Legends の対戦中にアプリを使用してください。',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -88,7 +89,7 @@ class LiveGameScreen extends ConsumerWidget {
                                   const SnackBar(content: Text('名前をコピーしました')),
                                 );
                               },
-                            )
+                            ),
                           ],
                         ),
                     ],
@@ -113,7 +114,11 @@ class LiveGameScreen extends ConsumerWidget {
 }
 
 class _TeamSection extends StatelessWidget {
-  const _TeamSection({required this.title, required this.players, required this.me});
+  const _TeamSection({
+    required this.title,
+    required this.players,
+    required this.me,
+  });
 
   final String title;
   final List<Player> players;
@@ -127,7 +132,10 @@ class _TeamSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          child: Text('$title (${players.length})', style: theme.textTheme.titleMedium),
+          child: Text(
+            '$title (${players.length})',
+            style: theme.textTheme.titleMedium,
+          ),
         ),
         ...players.map((p) => _PlayerTile(player: p, me: me)).cast<Widget>(),
       ],
@@ -143,11 +151,14 @@ class _PlayerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String name = player.riotId.isNotEmpty ? player.riotId : (player.summonerName);
-    final String champion = (player.championName.isNotEmpty
-            ? player.championName
-            : player.rawChampionName)
-        .replaceAll('game_character_displayname_', '');
+    final String name = player.riotId.isNotEmpty
+        ? player.riotId
+        : (player.summonerName);
+    final String champion =
+        (player.championName.isNotEmpty
+                ? player.championName
+                : player.rawChampionName)
+            .replaceAll('game_character_displayname_', '');
     final k = player.scores.kills;
     final d = player.scores.deaths;
     final a = player.scores.assists;
@@ -158,9 +169,7 @@ class _PlayerTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
-        leading: CircleAvatar(
-          child: Text(level.toString()),
-        ),
+        leading: CircleAvatar(child: Text(level.toString())),
         title: Text('$name${isMe ? ' (You)' : ''}'),
         subtitle: Text('$champion  |  KDA: $k/$d/$a  CS: $creepScore'),
       ),
@@ -184,13 +193,16 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off, size: 48),
             const SizedBox(height: 12),
-            Text('データの取得に失敗しました。League クライアントが起動しており、試合中であることを確認してください。\n\n$_prettyError', textAlign: TextAlign.center),
+            Text(
+              'データの取得に失敗しました。League クライアントが起動しており、試合中であることを確認してください。\n\n$_prettyError',
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('再試行'),
-            )
+            ),
           ],
         ),
       ),

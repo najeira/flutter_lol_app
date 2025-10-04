@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/all_game_data.dart';
-import '../services/live_client_service.dart';
+import '../services/game.dart';
 
 const _kRefreshInterval = Duration(seconds: 3);
 
