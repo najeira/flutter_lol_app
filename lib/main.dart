@@ -14,10 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'LoL Live Game Helper',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: ThemeData.dark(useMaterial3: true),
+      themeMode: ThemeMode.dark,
       home: const LiveGameScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
