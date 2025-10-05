@@ -102,14 +102,12 @@ class _PlayerTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     final diff = data.value - 50.0;
-    final bg = 100 + (diff * 5);
-
-    final bw = math.max(diff / 2.0, 0.0);
-    final pd = math.max(8.0 - bw, 0.0);
+    final bg = (100 + (diff * 5)).clamp(0.0, 255.0);
+    final bw = (diff / 2.0).clamp(0.0, 8.0);
 
     return Container(
       margin: const EdgeInsets.all(4.0),
-      padding: EdgeInsets.all(pd),
+      padding: EdgeInsets.all(8.0 - bw),
       decoration: BoxDecoration(
         color: _teamColor.withAlpha(bg.round()),
         borderRadius: BorderRadius.circular(10.0),
@@ -150,14 +148,14 @@ class _PlayerTile extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${data.power}',
-                    style: theme.textTheme.labelSmall,
-                  ),
                   // Text(
-                  //   'Lv: ${data.player.level}',
+                  //   '${data.power}',
                   //   style: theme.textTheme.labelSmall,
                   // ),
+                  Text(
+                    'Lv: ${data.player.level}',
+                    style: theme.textTheme.labelSmall,
+                  ),
                 ],
               ),
             ],
