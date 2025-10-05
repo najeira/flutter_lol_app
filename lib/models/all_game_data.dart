@@ -23,14 +23,15 @@ class AllGameData {
     required this.gameData,
   });
 
-  final ActivePlayer activePlayer;
+  final ActivePlayer? activePlayer;
   final List<Player> allPlayers;
   final LiveEvents events;
   final GameData gameData;
 
   factory AllGameData.fromJson(Map<String, dynamic> json) {
+    final ap = _activePlayer(json);
     return AllGameData(
-      activePlayer: ActivePlayer.fromJson(json['activePlayer'] as Map<String, dynamic>),
+      activePlayer: ap == null ? null : ActivePlayer.fromJson(ap),
       allPlayers: (json['allPlayers'] as List<dynamic>? ?? const [])
           .map((e) => Player.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -40,9 +41,20 @@ class AllGameData {
   }
 
   Map<String, dynamic> toJson() => {
-        'activePlayer': activePlayer.toJson(),
+        'activePlayer': activePlayer?.toJson(),
         'allPlayers': allPlayers.map((e) => e.toJson()).toList(),
         'events': events.toJson(),
         'gameData': gameData.toJson(),
       };
+}
+
+Map<String, dynamic>? _activePlayer(Map<String, dynamic> json) {
+  final ap = json['activePlayer'];
+  if (ap == null) {
+    return null;
+  }
+  if (ap['error'] != null) {
+    return null;
+  }
+  return ap;
 }

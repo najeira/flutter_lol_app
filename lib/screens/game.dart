@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lol_app/providers/player.dart';
+import 'package:flutter_lol_app/screens/teams_side_by_side.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/live_game_providers.dart';
+import '../providers/game.dart';
 import '../models/all_game_data.dart';
 import '../models/player.dart';
 
@@ -46,9 +48,12 @@ class LiveGameScreen extends ConsumerWidget {
           }
 
           final gameTime = _formatTime(data.gameData.gameTime);
-          final meName = data.activePlayer.riotIdGameName.isNotEmpty
-              ? data.activePlayer.riotIdGameName
-              : data.activePlayer.summonerName;
+          final ap = data.activePlayer;
+          String meName = '';
+          final a = ap;
+          if (a != null) {
+            meName = a.riotIdGameName.isNotEmpty ? a.riotIdGameName : a.summonerName;
+          }
 
           // Group players by team
           final order = players
@@ -95,8 +100,7 @@ class LiveGameScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                _TeamSection(title: 'ORDER', players: order, me: meName),
-                _TeamSection(title: 'CHAOS', players: chaos, me: meName),
+                _Teams(),
                 const SizedBox(height: 24),
               ],
             ),
@@ -113,66 +117,18 @@ class LiveGameScreen extends ConsumerWidget {
   }
 }
 
-class _TeamSection extends StatelessWidget {
-  const _TeamSection({
-    required this.title,
-    required this.players,
-    required this.me,
-  });
-
-  final String title;
-  final List<Player> players;
-  final String? me;
+class _Teams extends ConsumerWidget {
+  const _Teams({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          child: Text(
-            '$title (${players.length})',
-            style: theme.textTheme.titleMedium,
-          ),
-        ),
-        ...players.map((p) => _PlayerTile(player: p, me: me)).cast<Widget>(),
-      ],
-    );
-  }
-}
-
-class _PlayerTile extends StatelessWidget {
-  const _PlayerTile({required this.player, required this.me});
-
-  final Player player;
-  final String? me;
-
-  @override
-  Widget build(BuildContext context) {
-    final String name = player.riotId.isNotEmpty
-        ? player.riotId
-        : (player.summonerName);
-    final String champion =
-        (player.championName.isNotEmpty
-                ? player.championName
-                : player.rawChampionName)
-            .replaceAll('game_character_displayname_', '');
-    final k = player.scores.kills;
-    final d = player.scores.deaths;
-    final a = player.scores.assists;
-    final creepScore = player.scores.creepScore;
-    final level = player.level;
-    final bool isMe = me != null && (name == me || player.summonerName == me);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: ListTile(
-        leading: CircleAvatar(child: Text(level.toString())),
-        title: Text('$name${isMe ? ' (You)' : ''}'),
-        subtitle: Text('$champion  |  KDA: $k/$d/$a  CS: $creepScore'),
-      ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final future = ref.watch(playersByTeamProvider);
+    return future.when(
+        data: (data) {
+          return TeamsSideBySide(rows: data);
+        },
+        error: (_, __) => CircularProgressIndicator(),
+        loading: () => CircularProgressIndicator(),
     );
   }
 }
