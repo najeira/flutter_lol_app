@@ -46,7 +46,7 @@ class TeamsVertical extends StatelessWidget {
     if (player == null) {
       return SizedBox.shrink();
     }
-    return _Player(data: player);
+    return Expanded(child: _Player(data: player));
   }
 
   Widget _buildIndicator(PlayersData data, int index) {
@@ -135,7 +135,6 @@ class _Player extends StatelessWidget {
     final color = _teamColor;
 
     return Container(
-      width: 100.0,
       padding: EdgeInsets.all(8.0 - bw),
       decoration: BoxDecoration(
         color: color.withAlpha(bg.floor()),
