@@ -67,12 +67,13 @@ class _PlayerTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final diff = data.value - 50.0;
-    final bg = (100 + (diff * 5)).clamp(0.0, 255.0);
+    final diff = (data.value - 50).toDouble();
+    final bg = (100.0 + (diff * 5.0)).clamp(0.0, 255.0);
     final bw = (diff / 3.0).clamp(0.0, 8.0);
 
+    final vw = data.value.toStringAsFixed(0);
     final pw = (data.power / 1000.0).toStringAsFixed(1);
-    final gw = (data.gold.toDouble() / 1000.0).toStringAsFixed(1);
+    final gw = (data.gold / 1000.0).toStringAsFixed(1);
 
     final color = _teamColor;
     final labelStyle = theme.textTheme.labelSmall?.copyWith(
@@ -114,7 +115,8 @@ class _PlayerTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Lv ${data.player.level}', style: labelStyle),
-                  Text('${pw} p', style: labelStyle),
+                  // Text('${pw} p', style: labelStyle),
+                  Text('${vw} x', style: labelStyle),
                   Text('${gw} g', style: labelStyle),
                 ],
               ),
@@ -162,9 +164,9 @@ class _AdvantageRows extends StatelessWidget {
     const size = 16.0;
 
     Icon icon;
-    if (diff > 300.0) {
+    if (diff > 300) {
       icon = const Icon(Icons.arrow_upward, size: size, color: Colors.blue);
-    } else if (diff < -300.0) {
+    } else if (diff < -300) {
       icon = const Icon(Icons.arrow_downward, size: size, color: Colors.red);
     } else {
       icon = const Icon(
