@@ -135,7 +135,7 @@ const _levelScores = <int>[
 
 double _deviation(int score, double mean, double stddev) {
   // 標準偏差が小さすぎる場合の過剰な振れを抑えるため、最小値で下駄を履かせる
-  const floor = 1000.0;
+  const floor = 500.0;
   // final safeStddev = math.sqrt(stddev * stddev + floor * floor);
   final safeStddev = math.max(stddev, floor);
   return (score.toDouble() - mean) / safeStddev * 10.0 + 50.0;
