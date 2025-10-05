@@ -1,142 +1,107 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter_lol_app/providers/player.dart';
 import 'package:flutter_lol_app/providers/game.dart';
 import 'package:flutter_lol_app/screens/team.dart';
-import 'package:flutter_lol_app/models/all_game_data.dart';
 
-class LiveGameScreen extends ConsumerWidget {
+class LiveGameScreen extends StatelessWidget {
   const LiveGameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final async = ref.watch(gameDataProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LoL Live Game Helper'),
-        actions: [
-          IconButton(
-            onPressed: () => ref.invalidate(gameDataProvider),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
+        title: const _AppBarText(),
+        actions: const [_RefreshButton()],
       ),
-      body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _ErrorView(
-          error: e,
-          onRetry: () => ref.invalidate(gameDataProvider),
-        ),
-        data: (AllGameData data) {
-          final players = data.allPlayers;
-          if (players.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'ゲーム中のデータが見つかりません。\n'
-                  'League of Legends の対戦中にアプリを使用してください。',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-
-          final gameTime = _formatTime(data.gameData.gameTime);
-          final ap = data.activePlayer;
-          String meName = '';
-          final a = ap;
-          if (a != null) {
-            meName = a.riotIdGameName.isNotEmpty ? a.riotIdGameName : a.summonerName;
-          }
-
-          // Group players by team
-          final order = players
-              .where((p) => (p.team).toString().toUpperCase() == 'ORDER')
-              .toList();
-          final chaos = players
-              .where((p) => (p.team).toString().toUpperCase() == 'CHAOS')
-              .toList();
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await ref.refresh(gameDataProvider.future);
-            },
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '試合時間: $gameTime',
-                          style: theme.textTheme.titleMedium,
-                        ),
-                      ),
-                      if (meName.isNotEmpty)
-                        Row(
-                          children: [
-                            const Icon(Icons.person, size: 18),
-                            const SizedBox(width: 6),
-                            Text(meName),
-                            IconButton(
-                              icon: const Icon(Icons.copy, size: 18),
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: meName));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('名前をコピーしました')),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-                _Teams(),
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
-        },
-      ),
+      body: const _Body(),
     );
-  }
-
-  String _formatTime(double seconds) {
-    final m = seconds ~/ 60;
-    final s = seconds % 60;
-    return '${m.toString().padLeft(1, '0')}:${s.toInt().toString().padLeft(2, '0')}';
   }
 }
 
-class _Teams extends ConsumerWidget {
-  const _Teams({super.key});
+class _Body extends ConsumerWidget {
+  const _Body({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(playersByTeamProvider);
+    return async.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => _ErrorView(error: e),
+      data: (data) {
+        if (data.isEmpty) {
+          return Text("NO DATA");
+        }
+        return TeamsSideBySide(rows: data);
+      },
+    );
+  }
+}
+
+class _AppBarText extends ConsumerWidget {
+  const _AppBarText({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final future = ref.watch(playersByTeamProvider);
-    return future.when(
-        data: (data) {
-          return TeamsSideBySide(rows: data);
-        },
-        error: (_, __) => CircularProgressIndicator(),
-        loading: () => CircularProgressIndicator(),
+    final text = future.when(
+      data: (rows) {
+        // Build totals per team
+        final totals = <String, double>{};
+        for (final row in rows) {
+          if (row.isNotEmpty) {
+            final team = row.first.player.team.toUpperCase();
+            final sum = row.fold(0.0, (a, pd) => a + pd.power);
+            totals[team] = sum;
+          }
+        }
+
+        if (totals.length != 2) {
+          return '……';
+        }
+
+        final order = totals["ORDER"] ?? 2500.0;
+        final chaos = totals["CHAOS"] ?? 2500.0;
+        if (order > chaos) {
+          final diff = order / chaos;
+          if (diff < 1.1) {
+            return "互角";
+          }
+          return "青 ${diff.toStringAsFixed(1)}";
+        } else {
+          final diff = chaos / order;
+          if (diff < 1.1) {
+            return "互角";
+          }
+          return "赤 ${diff.toStringAsFixed(1)}";
+        }
+      },
+      error: (_, __) => "League of Legends",
+      loading: () => "League of Legends",
+    );
+    return Text(text);
+  }
+}
+
+class _RefreshButton extends StatelessWidget {
+  const _RefreshButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        context.container().invalidate(gameDataProvider);
+      },
+      icon: const Icon(Icons.refresh),
     );
   }
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.error, required this.onRetry});
+  const _ErrorView({required this.error});
 
   final Object error;
-  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -146,23 +111,32 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off, size: 48),
+            const Icon(Icons.connecting_airports, size: 48),
             const SizedBox(height: 12),
             Text(
-              'データの取得に失敗しました。League クライアントが起動しており、試合中であることを確認してください。\n\n$_prettyError',
+              'データの取得に失敗しました。'
+              'Leagueクライアントが起動しており、'
+              '試合中であることを確認してください。'
+              '\n\n${error}',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
-              onPressed: onRetry,
+              onPressed: () {
+                context.container().invalidate(gameDataProvider);
+              },
               icon: const Icon(Icons.refresh),
-              label: const Text('再試行'),
+              label: const Text('再読込'),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  String get _prettyError => error.toString();
+extension _BuildContextExtension on BuildContext {
+  ProviderContainer container() {
+    return ProviderScope.containerOf(this, listen: false);
+  }
 }
