@@ -13,63 +13,47 @@ class ChampionImage extends StatelessWidget {
   const ChampionImage({
     super.key,
     required this.player,
-    this.size = 48,
-    this.fit = BoxFit.cover,
-    this.borderRadius = 8,
-    this.placeholder,
-    this.backgroundColor,
+    this.size = 40.0,
   });
 
   final Player player;
   final double size;
-  final BoxFit fit;
-  final double borderRadius;
-  final Widget? placeholder;
-  final Color? backgroundColor;
 
   /// Derive something like `Briar` from `game_character_displayname_Briar`.
+  /// or `Character_Seraphine_Name`.
   static String _deriveChampionBaseName(Player p) {
     // Prefer rawChampionName because championName may be localized.
     String name = p.rawChampionName.trim();
+    name = name.removePrefix("game_character_displayname_");
+    name = name.removePrefix("Character_");
+    name = name.removeSuffix("_Name");
 
-    const prefix = "game_character_displayname_";
-    if (name.startsWith(prefix)) {
-      name = name.substring(prefix.length);
-    }
-
-    // Keep existing casing (assets seem to use proper casing already, e.g., DrMundo, Khazix).
+    // Keep existing casing (assets seem to use proper casing already,
+    // e.g., DrMundo, Khazix).
     // As a tiny normalization, ensure the first character is uppercase.
-    name = name[0].toUpperCase() + (name.length > 1 ? name.substring(1) : "");
-    return name;
+    return name.toFirstUppercase();
   }
 
   @override
   Widget build(BuildContext context) {
     final baseName = _deriveChampionBaseName(player);
     final assetPath = "assets/champion/${baseName}.png";
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Container(
-        width: size,
-        height: size,
-        color: backgroundColor ?? Colors.black12,
-        child: Image.asset(
-          assetPath,
-          width: size,
-          height: size,
-          fit: fit,
-          filterQuality: FilterQuality.medium,
-          errorBuilder: (context, error, stackTrace) {
-            return placeholder ?? _DefaultPlaceholder(size: size);
-          },
-        ),
-      ),
+    return Image.asset(
+      assetPath,
+      width: size,
+      height: size,
+      fit: BoxFit.fill,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (context, error, stackTrace) {
+        return _Placeholder(size: size);
+      },
     );
   }
 }
 
-class _DefaultPlaceholder extends StatelessWidget {
-  const _DefaultPlaceholder({required this.size});
+class _Placeholder extends StatelessWidget {
+  const _Placeholder({required this.size});
+
   final double size;
 
   @override
@@ -83,5 +67,25 @@ class _DefaultPlaceholder extends StatelessWidget {
         color: Colors.grey.shade600,
       ),
     );
+  }
+}
+
+extension StringExtension on String {
+  String removePrefix(String prefix) {
+    if (startsWith(prefix)) {
+      return substring(prefix.length);
+    }
+    return this;
+  }
+
+  String removeSuffix(String suffix) {
+    if (endsWith(suffix)) {
+      return substring(0, length - suffix.length);
+    }
+    return this;
+  }
+
+  String toFirstUppercase() {
+    return this[0].toUpperCase() + (length > 1 ? substring(1) : "");
   }
 }

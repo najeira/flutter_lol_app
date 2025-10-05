@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/player.dart';
 import '../providers/game.dart';
-import '../screens/team.dart';
+
+import 'team.dart';
 
 class LiveGameScreen extends StatelessWidget {
   const LiveGameScreen({super.key});
@@ -15,7 +16,7 @@ class LiveGameScreen extends StatelessWidget {
         title: const _AppBarText(),
         actions: const [_RefreshButton()],
       ),
-      body: const SingleChildScrollView(child: _Body()),
+      body: const _Body(),
     );
   }
 }
@@ -29,7 +30,10 @@ class _Body extends ConsumerWidget {
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => _ErrorView(error: e),
-      data: (data) => TeamsSideBySide(data),
+      data: (data) => Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+        child: TeamsVertical(data),
+      ),
     );
   }
 }
@@ -49,85 +53,57 @@ class _AppBarText extends ConsumerWidget {
 
         final blueG = data.blue.fold(0, (a, pd) => a + pd.gold);
         final redG = data.red.fold(0, (a, pd) => a + pd.gold);
-        final blueK = blueG.toDouble() / 1000.0;
-        final redK = redG.toDouble() / 1000.0;
+        final blueK = blueG / 1000.0;
+        final redK = redG / 1000.0;
 
         late FontWeight bw;
         late FontWeight rw;
-        late Icon icon;
-        late double pad;
         if (diff > 1.15) {
           bw = FontWeight.w800;
           rw = FontWeight.w200;
-          icon = const Icon(
-            Icons.keyboard_double_arrow_left,
-            color: Colors.blue,
-            size: 24.0,
-          );
-          pad = 0.0;
         } else if (diff > 1.10) {
           bw = FontWeight.w700;
           rw = FontWeight.w300;
-          icon = const Icon(
-            Icons.keyboard_double_arrow_left,
-            color: Colors.blue,
-            size: 22.0,
-          );
-          pad = 2.0;
         } else if (diff > 1.05) {
           bw = FontWeight.w600;
           rw = FontWeight.w400;
-          icon = const Icon(
-            Icons.keyboard_arrow_left,
-            color: Colors.blue,
-            size: 20.0,
-          );
-          pad = 4.0;
         } else if (diff > 1.0) {
           bw = FontWeight.normal;
           rw = FontWeight.normal;
-          icon = Icon(
-            Icons.keyboard_arrow_left,
-            color: Colors.blue,
-            size: 18.0,
-          );
-          pad = 6.0;
         } else if (diff < 0.85) {
           bw = FontWeight.w200;
           rw = FontWeight.w800;
-          icon = const Icon(
-            Icons.keyboard_double_arrow_right,
-            color: Colors.red,
-            size: 24.0,
-          );
-          pad = 12.0;
         } else if (diff < 0.90) {
           bw = FontWeight.w300;
           rw = FontWeight.w700;
-          icon = const Icon(
-            Icons.keyboard_double_arrow_right,
-            color: Colors.red,
-            size: 22.0,
-          );
-          pad = 10.0;
         } else if (diff < 0.95) {
           bw = FontWeight.w400;
           rw = FontWeight.w600;
-          icon = const Icon(
-            Icons.keyboard_arrow_right,
-            color: Colors.red,
-            size: 20.0,
-          );
-          pad = 8.0;
         } else {
           bw = FontWeight.normal;
           rw = FontWeight.normal;
+        }
+
+        const iconSize = 16.0;
+        late Icon icon;
+        if (diff > 1.05) {
           icon = const Icon(
-            Icons.keyboard_arrow_right,
-            color: Colors.red,
-            size: 18.0,
+            Icons.align_horizontal_left,
+            color: Colors.blue,
+            size: iconSize,
           );
-          pad = 6.0;
+        } else if (diff < 0.95) {
+          icon = const Icon(
+            Icons.align_horizontal_right,
+            color: Colors.red,
+            size: iconSize,
+          );
+        } else {
+          icon = const Icon(
+            Icons.align_horizontal_center,
+            color: Colors.white70,
+            size: iconSize,
+          );
         }
 
         return Row(
@@ -140,10 +116,9 @@ class _AppBarText extends ConsumerWidget {
                 fontWeight: bw,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(left: pad, right: 12.0 - pad),
-              child: icon,
-            ),
+            const SizedBox(width: 4.0),
+            icon,
+            const SizedBox(width: 4.0),
             Text(
               redK.toStringAsFixed(1),
               style: theme.textTheme.titleLarge?.copyWith(

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/item_master.dart';
 import '../models/player.dart';
 import '../providers/game.dart';
 import '../services/player.dart';
@@ -56,9 +57,8 @@ class PlayersData {
 
 /// _allPlayersProvider を監視し、team ごとにプレイヤーを分割し、
 /// かつ position の順番でソートした結果を返します。
-final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((
-  ref,
-) {
+final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((ref) {
+  final itemMaster = ref.watch(itemMasterValueProvider);
   final playersAsync = ref.watch(_allPlayersProvider);
   return playersAsync.when(
     data: (players) {
@@ -66,6 +66,9 @@ final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((
       final red = <PlayerData>[];
 
       for (final p in players) {
+        p.player.items.sort((a, b) {
+          return _compareItemData(itemMaster?[a.itemID], itemMaster?[b.itemID]);
+        });
         final team = p.player.team.toUpperCase();
         if (team == "ORDER") {
           blue.add(p);
@@ -75,8 +78,8 @@ final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((
       }
 
       // Sort each team list by position order
-      blue.sort(_compare);
-      red.sort(_compare);
+      blue.sort(_comparePlayerData);
+      red.sort(_comparePlayerData);
       return AsyncData(PlayersData(blue: blue, red: red));
     },
     loading: () => const AsyncLoading(),
@@ -84,6 +87,17 @@ final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((
   );
 });
 
-int _compare(PlayerData a, PlayerData b) {
+int _comparePlayerData(PlayerData a, PlayerData b) {
   return a.player.positionOrder.compareTo(b.player.positionOrder);
+}
+
+int _compareItemData(ItemData? a, ItemData? b) {
+  // final bd = b?.depth ?? 0;
+  // final ad = a?.depth ?? 0;
+  // if (bd != ad) {
+  //   return bd.compareTo(ad);
+  // }
+  final bg = b?.gold.total ?? 0;
+  final ag = a?.gold.total ?? 0;
+  return bg.compareTo(ag);
 }

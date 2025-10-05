@@ -16,9 +16,9 @@ class PlayerData {
   });
 
   final Player player;
-  final double power;
+  final int power;
   final int gold;
-  final double value;
+  final int value;
 }
 
 /// AllGameData から全プレイヤーの強さを算出して返します。
@@ -26,9 +26,10 @@ List<PlayerData> computePlayersPower(
   AllGameData allGameData,
   ItemMaster itemMaster,
 ) {
-  final powers = allGameData.allPlayers.map((p) {
-    return _computePlayerPower(p, itemMaster);
-  });
+  // まず全プレイヤーのパワーを計算
+  final powers = allGameData.allPlayers.map(
+    (p) => _computePlayerPower(p, itemMaster),
+  );
 
   // 平均値
   final totalPower = powers.fold(0.0, (a, b) => a + b.total);
@@ -46,41 +47,38 @@ List<PlayerData> computePlayersPower(
   final stddev = math.sqrt(variance);
 
   return powers.mapIndexed((i, e) {
-    final value = _deviation(e.total, averagePower, stddev);
     final player = allGameData.allPlayers[i];
     return PlayerData(
       player: player,
       power: e.total,
-      value: value,
       gold: e.gold,
+      value: _deviation(e.total, averagePower, stddev).round(),
     );
   }).toList();
 }
 
-class Power {
-  Power({required this.items, required this.level, required this.gold});
+class _Power {
+  _Power({required this.items, required this.level, required this.gold});
 
-  final double items;
-  final double level;
+  final int items;
+  final int level;
   final int gold;
 
-  double get total => items + level;
+  int get total => items + level;
 }
 
 /// 単一プレイヤーの強さを算出します。
-Power _computePlayerPower(Player player, ItemMaster itemMaster) {
+_Power _computePlayerPower(Player player, ItemMaster itemMaster) {
   double itemsPower = 0.0;
   int itemsGold = 0;
   for (final item in player.items) {
     itemsPower += _powerOfItem(item, itemMaster);
     itemsGold += _goldOfItem(item, itemMaster);
   }
+
   final levelPower = _levelScores[player.level - 1];
-  return Power(
-    items: itemsPower,
-    level: levelPower.toDouble(),
-    gold: itemsGold,
-  );
+
+  return _Power(items: itemsPower.round(), level: levelPower, gold: itemsGold);
 }
 
 extension ItemExtension on Item {
@@ -92,6 +90,12 @@ int _goldOfItem(Item item, ItemMaster master) {
   if (data == null) {
     return item.priceTotal;
   }
+
+  if (!data.gold.purchasable) {
+    // 英気満点ビスケットなど
+    return 0;
+  }
+
   return data.gold.total;
 }
 
@@ -101,12 +105,13 @@ double _powerOfItem(Item item, ItemMaster master) {
     return item.priceTotal.toDouble();
   }
 
-  final price = data.gold.total.toDouble();
-  if (data.depth <= 0 || data.consumed) {
-    return price;
+  if (!data.gold.purchasable) {
+    // 英気満点ビスケットなど
+    return 0.0;
   }
 
-  switch (data.depth) {
+  final price = data.gold.total.toDouble();
+  switch (data.rare) {
     case 3:
       return price * 1.16;
     case 2:
@@ -137,10 +142,8 @@ const _levelScores = <int>[
   8050,
 ];
 
-double _deviation(double score, double mean, double stddev) {
-  // 標準偏差が0の場合（全員が同じスコアなど）は、偏差値は50
-  if (stddev == 0) {
-    return 50.0;
-  }
-  return (score - mean) / stddev * 10 + 50;
+double _deviation(int score, double mean, double stddev) {
+  const floor = 500.0;
+  final safeStddev = math.max(stddev, floor);
+  return (score.toDouble() - mean) / safeStddev * 10.0 + 50.0;
 }

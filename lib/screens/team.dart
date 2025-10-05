@@ -2,53 +2,116 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/player.dart';
+import '../models/item.dart' show Item;
+import '../providers/item.dart';
 import '../providers/player.dart';
+import '../services/player.dart';
 
 import 'champion_image.dart';
+import 'item_image.dart';
 
-/// Displays teams as multiple rows using playersByTeamProvider.
-///
-/// - Single-team widget: [_TeamRow] shows one team's players.
-/// - Multi-row widget: [TeamsSideBySide] stacks multiple teams vertically.
-class TeamsSideBySide extends StatelessWidget {
-  const TeamsSideBySide(this.data, {super.key});
+/// Displays teams as columns placed horizontally side-by-side.
+class TeamsVertical extends StatelessWidget {
+  const TeamsVertical(this.data, {super.key});
 
   /// players grouped by team, already sorted by position.
   final PlayersData data;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _TeamRow(players: data.blue),
-        _AdvantageRows(data),
-        _TeamRow(players: data.red),
-      ],
+    final length = math.max(data.blue.length, data.red.length);
+    return ListView(
+      children: [for (int i = 0; i < length; i++) _build(data, i)],
+    );
+  }
+
+  Widget _build(PlayersData data, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        spacing: 8.0,
+        children: [
+          _buildPlayer(data.blue, index),
+          _buildIndicator(data, index),
+          _buildPlayer(data.red, index),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayer(List<PlayerData> players, int index) {
+    final player = players.elementAtOrNull(index);
+    if (player == null) {
+      return SizedBox.shrink();
+    }
+    return Expanded(child: _Player(data: player));
+  }
+
+  Widget _buildIndicator(PlayersData data, int index) {
+    return _Indicator(
+      blue: data.blue.elementAtOrNull(index),
+      red: data.red.elementAtOrNull(index),
     );
   }
 }
 
-class _TeamRow extends StatelessWidget {
-  const _TeamRow({required this.players});
+class _Indicator extends StatelessWidget {
+  const _Indicator({super.key, required this.blue, required this.red});
 
-  final List<PlayerData> players;
+  final PlayerData? blue;
+  final PlayerData? red;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final theme = Theme.of(context);
+
+    if (blue == null || red == null) {
+      return const SizedBox.shrink();
+    }
+
+    final diff = blue!.power - red!.power;
+    final label = (diff / 1000.0).abs().toStringAsFixed(1);
+
+    const size = 14.0;
+
+    Icon icon;
+    if (diff > 500) {
+      icon = const Icon(
+        Icons.align_horizontal_left,
+        size: size,
+        color: Colors.blue,
+      );
+    } else if (diff < -500) {
+      icon = const Icon(
+        Icons.align_horizontal_right,
+        size: size,
+        color: Colors.red,
+      );
+    } else {
+      icon = const Icon(
+        Icons.align_horizontal_center,
+        size: size,
+        color: Colors.white70,
+      );
+    }
+
+    return Column(
       children: [
-        const SizedBox(width: 8.0),
-        for (final pd in players) Flexible(child: _PlayerTile(data: pd)),
-        const SizedBox(width: 8.0),
+        icon,
+        const SizedBox(height: 2.0),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(color: icon.color),
+        ),
       ],
     );
   }
 }
 
-class _PlayerTile extends StatelessWidget {
-  const _PlayerTile({required this.data});
+class _Player extends StatelessWidget {
+  const _Player({super.key, required this.data});
 
   final PlayerData data;
 
@@ -65,22 +128,13 @@ class _PlayerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final diff = data.value - 50.0;
-    final bg = (100 + (diff * 5)).clamp(0.0, 255.0);
+    final diff = (data.value - 50).toDouble();
+    final bg = (100.0 + (diff * 5.0)).clamp(0.0, 255.0);
     final bw = (diff / 3.0).clamp(0.0, 8.0);
 
-    final pw = (data.power / 1000.0).toStringAsFixed(1);
-    final gw = (data.gold.toDouble() / 1000.0).toStringAsFixed(1);
-
     final color = _teamColor;
-    final labelStyle = theme.textTheme.labelSmall?.copyWith(
-      fontWeight: FontWeight.normal,
-    );
 
     return Container(
-      margin: const EdgeInsets.all(4.0),
       padding: EdgeInsets.all(8.0 - bw),
       decoration: BoxDecoration(
         color: color.withAlpha(bg.floor()),
@@ -90,112 +144,127 @@ class _PlayerTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            data.player.championName,
-            maxLines: 1,
-            overflow: TextOverflow.clip,
-            style: theme.textTheme.labelSmall,
-          ),
+          ChampionName(data: data),
           const SizedBox(height: 2.0),
-          Row(
-            children: [
-              Stack(
-                children: [
-                  ChampionImage(
-                    player: data.player,
-                    size: 44.0,
-                    borderRadius: 8.0,
-                  ),
-                  if (data.player.isDead) const Positioned.fill(child: _Dead()),
-                ],
-              ),
-              const SizedBox(width: 4.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Lv ${data.player.level}', style: labelStyle),
-                  Text('${pw} p', style: labelStyle),
-                  Text('${gw} g', style: labelStyle),
-                ],
-              ),
-            ],
-          ),
+          ChampionIcon(data: data),
+          const SizedBox(height: 4.0),
+          _Items(data.player.items),
         ],
       ),
     );
   }
 }
 
-class _AdvantageRows extends StatelessWidget {
-  const _AdvantageRows(this.data, {super.key});
+class _Items extends ConsumerWidget {
+  const _Items(this.items, {super.key});
 
-  final PlayersData data;
+  final List<Item> items;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemMaster = ref.watch(itemMasterValueProvider);
+
+    final values = items.map((item) {
+      // debugPrint(item.toJson().toString());
+      if (item.consumable) {
+        return null;
+      }
+
+      final data = itemMaster?[item.itemID];
+      if (data == null) {
+        return null;
+      } else if (data.consumed) {
+        return null;
+      } else if (!data.inStore) {
+        return null;
+      } else if (data.gold.total <= 0) {
+        return null;
+      } else if (data.gold.sell <= 0) {
+        // return null;
+      } else if (data.tags.contains("Consumable")) {
+        return null;
+      }
+
+      return data;
+    }).nonNulls;
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.end,
+      spacing: 2.0,
+      runSpacing: 2.0,
+      children: [for (final value in values) ItemIcon(item: value)],
+    );
+  }
+}
+
+class ChampionName extends StatelessWidget {
+  const ChampionName({super.key, required this.data});
+
+  final PlayerData data;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final length = math.max(data.blue.length, data.red.length);
-    return Row(
-      children: [
-        for (int i = 0; i < length; i++)
-          Flexible(
-            child: Center(
-              child: _buildIndicator(
-                theme,
-                data.blue.elementAtOrNull(i),
-                data.red.elementAtOrNull(i),
-              ),
-            ),
-          ),
-      ],
+    final color = data.player.isDead ? Colors.black54 : null;
+    return Text(
+      data.player.championName,
+      maxLines: 1,
+      overflow: TextOverflow.clip,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: color,
+      ),
     );
   }
+}
 
-  Widget _buildIndicator(ThemeData theme, PlayerData? blue, PlayerData? red) {
-    if (blue == null || red == null) {
-      return const SizedBox.shrink();
-    }
+class ChampionIcon extends StatelessWidget {
+  const ChampionIcon({super.key, required this.data});
 
-    final diff = blue.power - red.power;
-    final label = (diff / 1000.0).abs().toStringAsFixed(1);
+  final PlayerData data;
 
-    const size = 16.0;
-
-    Icon icon;
-    if (diff > 300.0) {
-      icon = const Icon(Icons.arrow_upward, size: size, color: Colors.blue);
-    } else if (diff < -300.0) {
-      icon = const Icon(Icons.arrow_downward, size: size, color: Colors.red);
-    } else {
-      icon = const Icon(
-        Icons.compare_arrows,
-        size: size,
-        color: Colors.white70,
-      );
-    }
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final labelStyle = theme.textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.bold,
+    );
+    return Stack(
       children: [
-        icon,
-        const SizedBox(width: 2.0),
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(color: icon.color),
+        ChampionImage(player: data.player),
+        Positioned(
+          top: 0.0,
+          left: 0.0,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 0.0),
+            color: Colors.black38,
+            child: Text("${data.value}", style: labelStyle),
+          ),
         ),
+        Positioned(
+          bottom: 0.0,
+          right: 0.0,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 2.0),
+            color: Colors.black38,
+            child: Text("${data.player.level}", style: labelStyle),
+          ),
+        ),
+        if (data.player.isDead)
+          const Positioned.fill(child: ChampionDeadOverlay()),
       ],
     );
   }
 }
 
-class _Dead extends StatelessWidget {
-  const _Dead({super.key});
+class ChampionDeadOverlay extends StatelessWidget {
+  const ChampionDeadOverlay({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.black54,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(4.0),
       ),
       child: const Icon(Icons.close, color: Colors.white70, size: 28.0),
     );

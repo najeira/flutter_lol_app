@@ -23,7 +23,8 @@ class ItemMaster {
   final Map<int, ItemData> data;
 
   factory ItemMaster.fromJson(Map<String, dynamic> json) {
-    final rawData = (json['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final rawData =
+        (json['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
     final parsed = <int, ItemData>{};
     for (final entry in rawData.entries) {
       final id = int.tryParse(entry.key);
@@ -39,10 +40,10 @@ class ItemMaster {
   }
 
   Map<String, dynamic> toJson() => {
-        'type': type,
-        'version': version,
-        'data': data.map((k, v) => MapEntry(k.toString(), v.toJson())),
-      };
+    'type': type,
+    'version': version,
+    'data': data.map((k, v) => MapEntry(k.toString(), v.toJson())),
+  };
 
   /// Returns item by numeric ID if exists.
   ItemData? operator [](int id) => data[id];
@@ -93,53 +94,60 @@ class ItemData {
   final ItemImage image;
 
   factory ItemData.fromJson(Map<String, dynamic> json) => ItemData(
-        name: (json['name'] as String?) ?? '',
-        description: (json['description'] as String?) ?? '',
-        plaintext: (json['plaintext'] as String?) ?? '',
-        colloq: (json['colloq'] as String?) ?? '',
-        into: _asIdList(json['into']),
-        from: _asIdList(json['from']),
-        gold: ItemGold.fromJson(json['gold'] as Map<String, dynamic>? ?? const {}),
-        tags: (json['tags'] as List?)?.whereType<String>().toList() ?? const <String>[],
-        maps: _asBoolMap(json['maps']),
-        stats: _asNumMap(json['stats']),
-        depth: (json['depth'] as num?)?.toInt() ?? 0,
-        stacks: (json['stacks'] as num?)?.toInt() ?? 0,
-        consumed: (json['consumed'] as bool?) ?? false,
-        inStore: (json['inStore'] as bool?) ?? true,
-        hideFromAll: (json['hideFromAll'] as bool?) ?? false,
-        requiredAlly: (json['requiredAlly'] as String?) ?? '',
-        requiredChampion: (json['requiredChampion'] as String?) ?? '',
-        specialRecipe: (json['specialRecipe'] as num?)?.toInt() ?? 0,
-        image: ItemImage.fromJson(json['image'] as Map<String, dynamic>? ?? const {}),
-      );
+    name: (json['name'] as String?) ?? '',
+    description: (json['description'] as String?) ?? '',
+    plaintext: (json['plaintext'] as String?) ?? '',
+    colloq: (json['colloq'] as String?) ?? '',
+    into: _asIdList(json['into']),
+    from: _asIdList(json['from']),
+    gold: ItemGold.fromJson(json['gold'] as Map<String, dynamic>? ?? const {}),
+    tags:
+        (json['tags'] as List?)?.whereType<String>().toList() ??
+        const <String>[],
+    maps: _asBoolMap(json['maps']),
+    stats: _asNumMap(json['stats']),
+    depth: (json['depth'] as num?)?.toInt() ?? 0,
+    stacks: (json['stacks'] as num?)?.toInt() ?? 0,
+    consumed: (json['consumed'] as bool?) ?? false,
+    inStore: (json['inStore'] as bool?) ?? true,
+    hideFromAll: (json['hideFromAll'] as bool?) ?? false,
+    requiredAlly: (json['requiredAlly'] as String?) ?? '',
+    requiredChampion: (json['requiredChampion'] as String?) ?? '',
+    specialRecipe: (json['specialRecipe'] as num?)?.toInt() ?? 0,
+    image: ItemImage.fromJson(
+      json['image'] as Map<String, dynamic>? ?? const {},
+    ),
+  );
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-        'plaintext': plaintext,
-        'colloq': colloq,
-        'into': into.map((e) => e.toString()).toList(),
-        'from': from.map((e) => e.toString()).toList(),
-        'gold': gold.toJson(),
-        'tags': tags,
-        'maps': maps,
-        'stats': stats,
-        'depth': depth,
-        'stacks': stacks,
-        'consumed': consumed,
-        'inStore': inStore,
-        'hideFromAll': hideFromAll,
-        'requiredAlly': requiredAlly,
-        'requiredChampion': requiredChampion,
-        'specialRecipe': specialRecipe,
-        'image': image.toJson(),
-      };
+    'name': name,
+    'description': description,
+    'plaintext': plaintext,
+    'colloq': colloq,
+    'into': into.map((e) => e.toString()).toList(),
+    'from': from.map((e) => e.toString()).toList(),
+    'gold': gold.toJson(),
+    'tags': tags,
+    'maps': maps,
+    'stats': stats,
+    'depth': depth,
+    'stacks': stacks,
+    'consumed': consumed,
+    'inStore': inStore,
+    'hideFromAll': hideFromAll,
+    'requiredAlly': requiredAlly,
+    'requiredChampion': requiredChampion,
+    'specialRecipe': specialRecipe,
+    'image': image.toJson(),
+  };
 
   static List<int> _asIdList(dynamic v) {
     if (v is List) {
       return v
-          .map((e) => e is num ? e.toInt() : (e is String ? int.tryParse(e) : null))
+          .map(
+            (e) =>
+                e is num ? e.toInt() : (e is String ? int.tryParse(e) : null),
+          )
           .whereType<int>()
           .toList();
     }
@@ -148,7 +156,9 @@ class ItemData {
 
   static Map<String, bool> _asBoolMap(dynamic v) {
     if (v is Map) {
-      return v.map<String, bool>((key, value) => MapEntry('$key', value == true));
+      return v.map<String, bool>(
+        (key, value) => MapEntry('$key', value == true),
+      );
     }
     return const <String, bool>{};
   }
@@ -179,18 +189,18 @@ class ItemGold {
   final bool purchasable;
 
   factory ItemGold.fromJson(Map<String, dynamic> json) => ItemGold(
-        base: (json['base'] as num?)?.toInt() ?? 0,
-        total: (json['total'] as num?)?.toInt() ?? 0,
-        sell: (json['sell'] as num?)?.toInt() ?? 0,
-        purchasable: (json['purchasable'] as bool?) ?? false,
-      );
+    base: (json['base'] as num?)?.toInt() ?? 0,
+    total: (json['total'] as num?)?.toInt() ?? 0,
+    sell: (json['sell'] as num?)?.toInt() ?? 0,
+    purchasable: (json['purchasable'] as bool?) ?? false,
+  );
 
   Map<String, dynamic> toJson() => {
-        'base': base,
-        'total': total,
-        'sell': sell,
-        'purchasable': purchasable,
-      };
+    'base': base,
+    'total': total,
+    'sell': sell,
+    'purchasable': purchasable,
+  };
 }
 
 class ItemImage {
@@ -213,29 +223,47 @@ class ItemImage {
   final int h;
 
   factory ItemImage.fromJson(Map<String, dynamic> json) => ItemImage(
-        full: (json['full'] as String?) ?? '',
-        sprite: (json['sprite'] as String?) ?? '',
-        group: (json['group'] as String?) ?? '',
-        x: (json['x'] as num?)?.toInt() ?? 0,
-        y: (json['y'] as num?)?.toInt() ?? 0,
-        w: (json['w'] as num?)?.toInt() ?? 0,
-        h: (json['h'] as num?)?.toInt() ?? 0,
-      );
+    full: (json['full'] as String?) ?? '',
+    sprite: (json['sprite'] as String?) ?? '',
+    group: (json['group'] as String?) ?? '',
+    x: (json['x'] as num?)?.toInt() ?? 0,
+    y: (json['y'] as num?)?.toInt() ?? 0,
+    w: (json['w'] as num?)?.toInt() ?? 0,
+    h: (json['h'] as num?)?.toInt() ?? 0,
+  );
 
   Map<String, dynamic> toJson() => {
-        'full': full,
-        'sprite': sprite,
-        'group': group,
-        'x': x,
-        'y': y,
-        'w': w,
-        'h': h,
-      };
+    'full': full,
+    'sprite': sprite,
+    'group': group,
+    'x': x,
+    'y': y,
+    'w': w,
+    'h': h,
+  };
 }
 
 /// Load item master data from bundled asset (assets/item.json).
-Future<ItemMaster> loadItemMaster({String assetPath = 'assets/item.json'}) async {
+Future<ItemMaster> loadItemMaster({
+  String assetPath = 'assets/item.json',
+}) async {
   final jsonStr = await rootBundle.loadString(assetPath);
   final root = json.decode(jsonStr) as Map<String, dynamic>;
   return ItemMaster.fromJson(root);
+}
+
+extension ItemDataExtension on ItemData {
+  int get rare {
+    if (depth >= 3) {
+      return depth;
+    } else if (depth >= 2) {
+      if (gold.total >= 3000) {
+        return 3;
+      }
+      return depth;
+    } else if (gold.total >= 875) {
+      return 2;
+    }
+    return depth;
+  }
 }
