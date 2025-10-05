@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_lol_app/providers/player.dart';
-import 'package:flutter_lol_app/screens/teams_side_by_side.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/game.dart';
-import '../models/all_game_data.dart';
-import '../models/player.dart';
+import 'package:flutter_lol_app/providers/player.dart';
+import 'package:flutter_lol_app/providers/game.dart';
+import 'package:flutter_lol_app/screens/team.dart';
+import 'package:flutter_lol_app/models/all_game_data.dart';
 
 class LiveGameScreen extends ConsumerWidget {
   const LiveGameScreen({super.key});

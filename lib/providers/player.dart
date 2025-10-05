@@ -12,7 +12,13 @@ final playersProvider = Provider.autoDispose<AsyncValue<List<PlayerData>>>((
   final itemMaster = ref.watch(itemMasterProvider);
   final gameData = ref.watch(gameDataProvider);
   return itemMaster.when(
+    skipLoadingOnReload: true,
+    skipLoadingOnRefresh: true,
+    skipError: true,
     data: (im) => gameData.when(
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+      skipError: true,
       data: (gd) => AsyncData(computePlayersPower(gd, im)),
       loading: () => AsyncLoading(),
       error: (error, stackTrace) => AsyncError(error, stackTrace),
@@ -30,19 +36,15 @@ const _orderIndex = {
   'UTILITY': 4,
 };
 
-int _positionOrder(Player p) {
-  final pos = p.position.toUpperCase();
-  return _orderIndex[pos] ?? _orderIndex.length;
-}
-
 extension PlayerExtension on Player {
   int get positionOrder {
-    return _positionOrder(this);
+    final pos = position.toUpperCase();
+    return _orderIndex[pos] ?? _orderIndex.length;
   }
 }
 
 /// playersProvider を監視し、team ごとにプレイヤーを分割し、
-/// かつ position の順番 (TOP, JUNGLE, MID, BOT, SUPPORT, NONE) でソートした結果を返します。
+/// かつ position の順番でソートした結果を返します。
 final playersByTeamProvider =
     Provider.autoDispose<AsyncValue<List<List<PlayerData>>>>((ref) {
       final playersAsync = ref.watch(playersProvider);

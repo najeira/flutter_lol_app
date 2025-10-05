@@ -1,13 +1,20 @@
+import 'dart:math' as math;
+
 import '../models/all_game_data.dart';
 import '../models/item.dart';
 import '../models/item_master.dart';
 import '../models/player.dart';
 
 class PlayerData {
-  const PlayerData({required this.player, required this.power});
+  const PlayerData({
+    required this.player,
+    required this.power,
+    required this.value,
+  });
 
   final Player player;
   final double power;
+  final double value;
 }
 
 /// AllGameData から全プレイヤーの強さを算出して返します。
@@ -15,8 +22,32 @@ List<PlayerData> computePlayersPower(
   AllGameData allGameData,
   ItemMaster itemMaster,
 ) {
-  return allGameData.allPlayers.map((p) {
-    return PlayerData(player: p, power: _computePlayerPower(p, itemMaster));
+  final entries = allGameData.allPlayers.map((p) {
+    return MapEntry(p, _computePlayerPower(p, itemMaster));
+  });
+
+  // 平均値
+  final totalPower = entries.fold(0.0, (a, b) => a + b.value);
+  final averagePower = totalPower / entries.length;
+
+  // 各スコアと平均値との差の2乗の合計（分散の分子）を求める
+  final varianceSum = entries
+      .map((e) => math.pow(e.value - averagePower, 2))
+      .reduce((a, b) => a + b);
+
+  // 分散
+  final variance = varianceSum / entries.length;
+
+  // 標準偏差
+  final stddev = math.sqrt(variance);
+
+  return entries.map((e) {
+    final value = _deviation(e.value, averagePower, stddev);
+    return PlayerData(
+      player: e.key,
+      power: e.value,
+      value: value,
+    );
   }).toList();
 }
 
@@ -75,3 +106,11 @@ final _levelScores = <int>[
   7650,
   8050,
 ];
+
+double _deviation(double score, double mean, double stddev) {
+  // 標準偏差が0の場合（全員が同じスコアなど）は、偏差値は50
+  if (stddev == 0) {
+    return 50.0;
+  }
+  return (score - mean) / stddev * 10 + 50;
+}
