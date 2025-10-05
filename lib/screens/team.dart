@@ -205,11 +205,14 @@ class ChampionName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final color = data.player.isDead ? Colors.black54 : null;
     return Text(
       data.player.championName,
       maxLines: 1,
       overflow: TextOverflow.clip,
-      style: theme.textTheme.labelSmall,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: color,
+      ),
     );
   }
 }
