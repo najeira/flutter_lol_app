@@ -92,12 +92,11 @@ int _comparePlayerData(PlayerData a, PlayerData b) {
 }
 
 int _compareItemData(ItemData? a, ItemData? b) {
-  final bd = b?.depth ?? 0;
-  final ad = a?.depth ?? 0;
-  if (bd != ad) {
-    return bd.compareTo(ad);
-  }
-
+  // final bd = b?.depth ?? 0;
+  // final ad = a?.depth ?? 0;
+  // if (bd != ad) {
+  //   return bd.compareTo(ad);
+  // }
   final bg = b?.gold.total ?? 0;
   final ag = a?.gold.total ?? 0;
   return bg.compareTo(ag);

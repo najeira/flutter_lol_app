@@ -239,3 +239,18 @@ Future<ItemMaster> loadItemMaster({String assetPath = 'assets/item.json'}) async
   final root = json.decode(jsonStr) as Map<String, dynamic>;
   return ItemMaster.fromJson(root);
 }
+
+extension ItemDataExtension on ItemData {
+  int get rare {
+    if (depth >= 3) {
+      return depth;
+    }
+    if (depth >= 2) {
+      if (gold.total > 3000) {
+        return 3;
+      }
+      return depth;
+    }
+    return depth;
+  }
+}

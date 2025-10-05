@@ -111,11 +111,7 @@ double _powerOfItem(Item item, ItemMaster master) {
   }
 
   final price = data.gold.total.toDouble();
-  if (data.depth <= 0) {
-    return price;
-  }
-
-  switch (data.depth) {
+  switch (data.rare) {
     case 3:
       return price * 1.16;
     case 2:

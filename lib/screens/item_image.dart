@@ -19,7 +19,7 @@ class ItemIcon extends StatelessWidget {
   final double borderRadius;
 
   double get size {
-    switch (item.depth) {
+    switch (item.rare) {
       case 3:
         return 24.0;
       case 2:
@@ -30,7 +30,7 @@ class ItemIcon extends StatelessWidget {
   }
 
   Color? get borderColor {
-    switch (item.depth) {
+    switch (item.rare) {
       case 3:
         return Colors.yellowAccent;
       default:
