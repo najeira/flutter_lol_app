@@ -1,10 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter_lol_app/models/player.dart';
-import 'package:flutter_lol_app/services/player.dart';
+import '../services/player.dart';
+import '../providers/player.dart';
+
 import 'champion_image.dart';
 
 /// Displays teams as multiple rows using playersByTeamProvider.
@@ -12,70 +13,35 @@ import 'champion_image.dart';
 /// - Single-team widget: [_TeamRow] shows one team's players.
 /// - Multi-row widget: [TeamsSideBySide] stacks multiple teams vertically.
 class TeamsSideBySide extends StatelessWidget {
-  const TeamsSideBySide({super.key, required this.rows, this.meName});
+  const TeamsSideBySide(this.data, {super.key});
 
   /// players grouped by team, already sorted by position.
-  final List<List<PlayerData>> rows;
-
-  /// Optional: player name to highlight (e.g., active player).
-  final String? meName;
-
-  Color _teamColor(ThemeData theme, String team) {
-    switch (team.toUpperCase()) {
-      case 'ORDER':
-        return theme.colorScheme.primary;
-      case 'CHAOS':
-        return theme.colorScheme.secondary;
-      default:
-        return theme.colorScheme.tertiary;
-    }
-  }
+  final PlayersData data;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    if (rows.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('プレイヤー情報がありません'),
-        ),
-      );
-    }
-
     return Column(
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final teamPlayers in rows) ...[
-          _TeamRow(
-            players: teamPlayers,
-            titleColor: _teamColor(
-              theme,
-              teamPlayers.isNotEmpty
-                  ? teamPlayers.first.player.team.toString()
-                  : 'TEAM',
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
+        _TeamRow(players: data.blue),
+        _AdvantageRows(data),
+        _TeamRow(players: data.red),
       ],
     );
   }
 }
 
 class _TeamRow extends StatelessWidget {
-  const _TeamRow({required this.players, required this.titleColor});
+  const _TeamRow({required this.players});
 
   final List<PlayerData> players;
-  final Color titleColor;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const SizedBox(width: 8.0),
         for (final pd in players) Flexible(child: _PlayerTile(data: pd)),
+        const SizedBox(width: 8.0),
       ],
     );
   }
@@ -91,9 +57,9 @@ class _PlayerTile extends StatelessWidget {
       case 'ORDER':
         return Colors.blue;
       case 'CHAOS':
-        return Colors.orange;
+        return Colors.red;
       default:
-        return Colors.blue;
+        return Colors.white;
     }
   }
 
@@ -103,15 +69,23 @@ class _PlayerTile extends StatelessWidget {
 
     final diff = data.value - 50.0;
     final bg = (100 + (diff * 5)).clamp(0.0, 255.0);
-    final bw = (diff / 2.0).clamp(0.0, 8.0);
+    final bw = (diff / 3.0).clamp(0.0, 8.0);
+
+    final pw = (data.power / 1000.0).toStringAsFixed(1);
+    final gw = (data.gold.toDouble() / 1000.0).toStringAsFixed(1);
+
+    final color = _teamColor;
+    final labelStyle = theme.textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.normal,
+    );
 
     return Container(
       margin: const EdgeInsets.all(4.0),
       padding: EdgeInsets.all(8.0 - bw),
       decoration: BoxDecoration(
-        color: _teamColor.withAlpha(bg.round()),
+        color: color.withAlpha(bg.floor()),
         borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: _teamColor, width: bw),
+        border: Border.all(color: color, width: bw),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +93,10 @@ class _PlayerTile extends StatelessWidget {
           Text(
             data.player.championName,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall,
+            overflow: TextOverflow.clip,
+            style: theme.textTheme.labelSmall,
           ),
+          const SizedBox(height: 2.0),
           Row(
             children: [
               Stack(
@@ -131,37 +106,98 @@ class _PlayerTile extends StatelessWidget {
                     size: 44.0,
                     borderRadius: 8.0,
                   ),
-                  if (data.player.isDead)
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.35),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(Icons.close, color: Colors.white70),
-                      ),
-                    ),
+                  if (data.player.isDead) const Positioned.fill(child: _Dead()),
                 ],
               ),
               const SizedBox(width: 4.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   '${data.power}',
-                  //   style: theme.textTheme.labelSmall,
-                  // ),
-                  Text(
-                    'Lv: ${data.player.level}',
-                    style: theme.textTheme.labelSmall,
-                  ),
+                  Text('Lv ${data.player.level}', style: labelStyle),
+                  Text('${pw} p', style: labelStyle),
+                  Text('${gw} g', style: labelStyle),
                 ],
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AdvantageRows extends StatelessWidget {
+  const _AdvantageRows(this.data, {super.key});
+
+  final PlayersData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final length = math.max(data.blue.length, data.red.length);
+    return Row(
+      children: [
+        for (int i = 0; i < length; i++)
+          Flexible(
+            child: Center(
+              child: _buildIndicator(
+                theme,
+                data.blue.elementAtOrNull(i),
+                data.red.elementAtOrNull(i),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildIndicator(ThemeData theme, PlayerData? blue, PlayerData? red) {
+    if (blue == null || red == null) {
+      return const SizedBox.shrink();
+    }
+
+    final diff = blue.power - red.power;
+    final label = (diff / 1000.0).abs().toStringAsFixed(1);
+
+    const size = 16.0;
+
+    Icon icon;
+    if (diff > 300.0) {
+      icon = const Icon(Icons.arrow_upward, size: size, color: Colors.blue);
+    } else if (diff < -300.0) {
+      icon = const Icon(Icons.arrow_downward, size: size, color: Colors.red);
+    } else {
+      icon = const Icon(
+        Icons.compare_arrows,
+        size: size,
+        color: Colors.white70,
+      );
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        icon,
+        const SizedBox(width: 2.0),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(color: icon.color),
+        ),
+      ],
+    );
+  }
+}
+
+class _Dead extends StatelessWidget {
+  const _Dead({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: const Icon(Icons.close, color: Colors.white70, size: 28.0),
     );
   }
 }

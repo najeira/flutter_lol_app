@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter_lol_app/providers/player.dart';
-import 'package:flutter_lol_app/providers/game.dart';
-import 'package:flutter_lol_app/screens/team.dart';
+import '../providers/player.dart';
+import '../providers/game.dart';
+import '../screens/team.dart';
 
 class LiveGameScreen extends StatelessWidget {
   const LiveGameScreen({super.key});
@@ -15,7 +15,7 @@ class LiveGameScreen extends StatelessWidget {
         title: const _AppBarText(),
         actions: const [_RefreshButton()],
       ),
-      body: const _Body(),
+      body: const SingleChildScrollView(child: _Body()),
     );
   }
 }
@@ -29,9 +29,7 @@ class _Body extends ConsumerWidget {
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => _ErrorView(error: e),
-      data: (data) {
-        return TeamsSideBySide(data);
-      },
+      data: (data) => TeamsSideBySide(data),
     );
   }
 }
@@ -135,49 +133,22 @@ class _AppBarText extends ConsumerWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: blueK.toStringAsFixed(1),
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.blueAccent,
-                      fontWeight: bw,
-                    ),
-                  ),
-                  TextSpan(
-                    text: "k",
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                ],
+            Text(
+              blueK.toStringAsFixed(1),
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.blueAccent,
+                fontWeight: bw,
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(
-                left: pad,
-                right: 12.0 - pad,
-              ),
+              padding: EdgeInsets.only(left: pad, right: 12.0 - pad),
               child: icon,
             ),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: redK.toStringAsFixed(1),
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.redAccent,
-                      fontWeight: rw,
-                    ),
-                  ),
-                  TextSpan(
-                    text: "k",
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                ],
+            Text(
+              redK.toStringAsFixed(1),
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.redAccent,
+                fontWeight: rw,
               ),
             ),
           ],
