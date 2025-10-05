@@ -15,7 +15,6 @@ class ItemIcon extends StatelessWidget {
   });
 
   final ItemData item;
-
   final BoxFit fit;
   final double borderRadius;
 
@@ -63,9 +62,8 @@ class ItemIcon extends StatelessWidget {
           width: size,
           height: size,
           fit: fit,
-          filterQuality: FilterQuality.medium,
           errorBuilder: (context, error, stackTrace) {
-            return _DefaultPlaceholder(size: size);
+            return _Placeholder(size: size);
           },
         ),
       ),
@@ -73,8 +71,8 @@ class ItemIcon extends StatelessWidget {
   }
 }
 
-class _DefaultPlaceholder extends StatelessWidget {
-  const _DefaultPlaceholder({required this.size});
+class _Placeholder extends StatelessWidget {
+  const _Placeholder({required this.size});
 
   final double size;
 

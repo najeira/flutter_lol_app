@@ -13,15 +13,11 @@ class ChampionImage extends StatelessWidget {
   const ChampionImage({
     super.key,
     required this.player,
-    this.size = 48.0,
-    this.fit = BoxFit.cover,
-    this.borderRadius = 8.0,
+    this.size = 40.0,
   });
 
   final Player player;
   final double size;
-  final BoxFit fit;
-  final double borderRadius;
 
   /// Derive something like `Briar` from `game_character_displayname_Briar`.
   /// or `Character_Seraphine_Name`.
@@ -42,25 +38,21 @@ class ChampionImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseName = _deriveChampionBaseName(player);
     final assetPath = "assets/champion/${baseName}.png";
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Image.asset(
-        assetPath,
-        width: size,
-        height: size,
-        fit: fit,
-        filterQuality: FilterQuality.medium,
-        errorBuilder: (context, error, stackTrace) {
-          // debugPrint(player.rawChampionName);
-          return _DefaultPlaceholder(size: size);
-        },
-      ),
+    return Image.asset(
+      assetPath,
+      width: size,
+      height: size,
+      fit: BoxFit.fill,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (context, error, stackTrace) {
+        return _Placeholder(size: size);
+      },
     );
   }
 }
 
-class _DefaultPlaceholder extends StatelessWidget {
-  const _DefaultPlaceholder({required this.size});
+class _Placeholder extends StatelessWidget {
+  const _Placeholder({required this.size});
 
   final double size;
 

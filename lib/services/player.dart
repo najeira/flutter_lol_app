@@ -57,8 +57,8 @@ List<PlayerData> computePlayersPower(
   }).toList();
 }
 
-class Power {
-  Power({required this.items, required this.level, required this.gold});
+class _Power {
+  _Power({required this.items, required this.level, required this.gold});
 
   final int items;
   final int level;
@@ -68,15 +68,17 @@ class Power {
 }
 
 /// 単一プレイヤーの強さを算出します。
-Power _computePlayerPower(Player player, ItemMaster itemMaster) {
+_Power _computePlayerPower(Player player, ItemMaster itemMaster) {
   double itemsPower = 0.0;
   int itemsGold = 0;
   for (final item in player.items) {
     itemsPower += _powerOfItem(item, itemMaster);
     itemsGold += _goldOfItem(item, itemMaster);
   }
+
   final levelPower = _levelScores[player.level - 1];
-  return Power(items: itemsPower.round(), level: levelPower, gold: itemsGold);
+
+  return _Power(items: itemsPower.round(), level: levelPower, gold: itemsGold);
 }
 
 extension ItemExtension on Item {
@@ -145,9 +147,7 @@ const _levelScores = <int>[
 ];
 
 double _deviation(int score, double mean, double stddev) {
-  // 標準偏差が小さすぎる場合の過剰な振れを抑えるため、最小値で下駄を履かせる
   const floor = 500.0;
-  // final safeStddev = math.sqrt(stddev * stddev + floor * floor);
   final safeStddev = math.max(stddev, floor);
   return (score.toDouble() - mean) / safeStddev * 10.0 + 50.0;
 }
