@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
+
 import '../models/all_game_data.dart';
 import '../models/item.dart';
 import '../models/item_master.dart';
@@ -9,11 +11,13 @@ class PlayerData {
   const PlayerData({
     required this.player,
     required this.power,
+    required this.gold,
     required this.value,
   });
 
   final Player player;
   final double power;
+  final int gold;
   final double value;
 }
 
@@ -22,57 +26,83 @@ List<PlayerData> computePlayersPower(
   AllGameData allGameData,
   ItemMaster itemMaster,
 ) {
-  final entries = allGameData.allPlayers.map((p) {
-    return MapEntry(p, _computePlayerPower(p, itemMaster));
+  final powers = allGameData.allPlayers.map((p) {
+    return _computePlayerPower(p, itemMaster);
   });
 
   // 平均値
-  final totalPower = entries.fold(0.0, (a, b) => a + b.value);
-  final averagePower = totalPower / entries.length;
+  final totalPower = powers.fold(0.0, (a, b) => a + b.total);
+  final averagePower = totalPower / powers.length;
 
   // 各スコアと平均値との差の2乗の合計（分散の分子）を求める
-  final varianceSum = entries
-      .map((e) => math.pow(e.value - averagePower, 2))
+  final varianceSum = powers
+      .map((e) => math.pow(e.total - averagePower, 2))
       .reduce((a, b) => a + b);
 
   // 分散
-  final variance = varianceSum / entries.length;
+  final variance = varianceSum / powers.length;
 
   // 標準偏差
   final stddev = math.sqrt(variance);
 
-  return entries.map((e) {
-    final value = _deviation(e.value, averagePower, stddev);
+  return powers.mapIndexed((i, e) {
+    final value = _deviation(e.total, averagePower, stddev);
+    final player = allGameData.allPlayers[i];
     return PlayerData(
-      player: e.key,
-      power: e.value,
+      player: player,
+      power: e.total,
       value: value,
+      gold: e.gold,
     );
   }).toList();
 }
 
-/// 単一プレイヤーの強さを算出します。
-double _computePlayerPower(Player player, ItemMaster itemMaster) {
-  final itemsPower = player.items
-      .map((it) => _entryForItem(it, itemMaster))
-      .reduce((a, b) => a + b);
-  final levelPower = _levelScores[player.level - 1];
-  return itemsPower + levelPower;
+class Power {
+  Power({required this.items, required this.level, required this.gold});
+
+  final double items;
+  final double level;
+  final int gold;
+
+  double get total => items + level;
 }
 
-double _entryForItem(Item item, ItemMaster master) {
+/// 単一プレイヤーの強さを算出します。
+Power _computePlayerPower(Player player, ItemMaster itemMaster) {
+  double itemsPower = 0.0;
+  int itemsGold = 0;
+  for (final item in player.items) {
+    itemsPower += _powerOfItem(item, itemMaster);
+    itemsGold += _goldOfItem(item, itemMaster);
+  }
+  final levelPower = _levelScores[player.level - 1];
+  return Power(
+    items: itemsPower,
+    level: levelPower.toDouble(),
+    gold: itemsGold,
+  );
+}
+
+extension ItemExtension on Item {
+  int get priceTotal => price * math.max(count, 1);
+}
+
+int _goldOfItem(Item item, ItemMaster master) {
   final data = master[item.itemID];
   if (data == null) {
-    return 0.0;
+    return item.priceTotal;
   }
+  return data.gold.total;
+}
 
-  // 消費アイテムは計算しない
-  if (data.consumed) {
-    return 0.0;
+double _powerOfItem(Item item, ItemMaster master) {
+  final data = master[item.itemID];
+  if (data == null) {
+    return item.priceTotal.toDouble();
   }
 
   final price = data.gold.total.toDouble();
-  if (data.depth <= 0) {
+  if (data.depth <= 0 || data.consumed) {
     return price;
   }
 
@@ -86,7 +116,7 @@ double _entryForItem(Item item, ItemMaster master) {
   }
 }
 
-final _levelScores = <int>[
+const _levelScores = <int>[
   0,
   350,
   700,
