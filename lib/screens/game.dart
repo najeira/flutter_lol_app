@@ -25,15 +25,12 @@ class _Body extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(playersByTeamProvider);
+    final async = ref.watch(playersProvider);
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => _ErrorView(error: e),
       data: (data) {
-        if (data.isEmpty) {
-          return Text("NO DATA");
-        }
-        return TeamsSideBySide(rows: data);
+        return TeamsSideBySide(data);
       },
     );
   }
@@ -44,43 +41,151 @@ class _AppBarText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final future = ref.watch(playersByTeamProvider);
-    final text = future.when(
-      data: (rows) {
-        // Build totals per team
-        final totals = <String, double>{};
-        for (final row in rows) {
-          if (row.isNotEmpty) {
-            final team = row.first.player.team.toUpperCase();
-            final sum = row.fold(0.0, (a, pd) => a + pd.power);
-            totals[team] = sum;
-          }
-        }
+    final theme = Theme.of(context);
+    final future = ref.watch(playersProvider);
+    return future.when(
+      data: (data) {
+        final blue = data.blue.fold(1.0, (a, pd) => a + pd.power);
+        final red = data.red.fold(1.0, (a, pd) => a + pd.power);
+        final diff = blue / red;
 
-        if (totals.length != 2) {
-          return '……';
-        }
+        final blueG = data.blue.fold(0, (a, pd) => a + pd.gold);
+        final redG = data.red.fold(0, (a, pd) => a + pd.gold);
+        final blueK = blueG.toDouble() / 1000.0;
+        final redK = redG.toDouble() / 1000.0;
 
-        final order = totals["ORDER"] ?? 2500.0;
-        final chaos = totals["CHAOS"] ?? 2500.0;
-        if (order > chaos) {
-          final diff = order / chaos;
-          if (diff < 1.1) {
-            return "互角";
-          }
-          return "青 ${diff.toStringAsFixed(1)}";
+        late FontWeight bw;
+        late FontWeight rw;
+        late Icon icon;
+        late double pad;
+        if (diff > 1.15) {
+          bw = FontWeight.w800;
+          rw = FontWeight.w200;
+          icon = const Icon(
+            Icons.keyboard_double_arrow_left,
+            color: Colors.blue,
+            size: 24.0,
+          );
+          pad = 0.0;
+        } else if (diff > 1.10) {
+          bw = FontWeight.w700;
+          rw = FontWeight.w300;
+          icon = const Icon(
+            Icons.keyboard_double_arrow_left,
+            color: Colors.blue,
+            size: 22.0,
+          );
+          pad = 2.0;
+        } else if (diff > 1.05) {
+          bw = FontWeight.w600;
+          rw = FontWeight.w400;
+          icon = const Icon(
+            Icons.keyboard_arrow_left,
+            color: Colors.blue,
+            size: 20.0,
+          );
+          pad = 4.0;
+        } else if (diff > 1.0) {
+          bw = FontWeight.normal;
+          rw = FontWeight.normal;
+          icon = Icon(
+            Icons.keyboard_arrow_left,
+            color: Colors.blue,
+            size: 18.0,
+          );
+          pad = 6.0;
+        } else if (diff < 0.85) {
+          bw = FontWeight.w200;
+          rw = FontWeight.w800;
+          icon = const Icon(
+            Icons.keyboard_double_arrow_right,
+            color: Colors.red,
+            size: 24.0,
+          );
+          pad = 12.0;
+        } else if (diff < 0.90) {
+          bw = FontWeight.w300;
+          rw = FontWeight.w700;
+          icon = const Icon(
+            Icons.keyboard_double_arrow_right,
+            color: Colors.red,
+            size: 22.0,
+          );
+          pad = 10.0;
+        } else if (diff < 0.95) {
+          bw = FontWeight.w400;
+          rw = FontWeight.w600;
+          icon = const Icon(
+            Icons.keyboard_arrow_right,
+            color: Colors.red,
+            size: 20.0,
+          );
+          pad = 8.0;
         } else {
-          final diff = chaos / order;
-          if (diff < 1.1) {
-            return "互角";
-          }
-          return "赤 ${diff.toStringAsFixed(1)}";
+          bw = FontWeight.normal;
+          rw = FontWeight.normal;
+          icon = const Icon(
+            Icons.keyboard_arrow_right,
+            color: Colors.red,
+            size: 18.0,
+          );
+          pad = 6.0;
         }
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: blueK.toStringAsFixed(1),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.blueAccent,
+                      fontWeight: bw,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "k",
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                left: pad,
+                right: 12.0 - pad,
+              ),
+              child: icon,
+            ),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: redK.toStringAsFixed(1),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.redAccent,
+                      fontWeight: rw,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "k",
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
       },
-      error: (_, __) => "League of Legends",
-      loading: () => "League of Legends",
+      error: (_, __) => const Text("League of Legends"),
+      loading: () => const Text("League of Legends"),
     );
-    return Text(text);
   }
 }
 
