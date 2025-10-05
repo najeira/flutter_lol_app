@@ -2,11 +2,16 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lol_app/models/item_master.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/item.dart' show Item;
+import '../providers/item.dart';
 import '../services/player.dart';
 import '../providers/player.dart';
 
 import 'champion_image.dart';
+import 'item_image.dart';
 
 /// Displays teams as multiple rows using playersByTeamProvider.
 ///
@@ -122,6 +127,8 @@ class _PlayerTile extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 4.0),
+          _ItemsRow(data.player.items),
         ],
       ),
     );
@@ -184,6 +191,49 @@ class _AdvantageRows extends StatelessWidget {
           label,
           style: theme.textTheme.labelSmall?.copyWith(color: icon.color),
         ),
+      ],
+    );
+  }
+}
+
+class _ItemsRow extends ConsumerWidget {
+  const _ItemsRow(this.items, {super.key});
+
+  final List<Item> items;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemMaster = ref.watch(itemMasterValueProvider);
+
+    final values = items.map((item) {
+      // debugPrint(item.toJson().toString());
+      if (item.consumable) {
+        return null;
+      }
+
+      final data = itemMaster?[item.itemID];
+      if (data == null) {
+        return null;
+      } else if (data.consumed) {
+        return null;
+      } else if (!data.inStore) {
+        return null;
+      } else if (data.gold.total <= 0) {
+        return null;
+      } else if (data.gold.sell <= 0) {
+        // return null;
+      } else if (data.tags.contains("Consumable")) {
+        return null;
+      }
+
+      return data;
+    }).nonNulls;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      spacing: 2.0,
+      children: [
+        for (final value in values) ItemIcon(item: value),
       ],
     );
   }

@@ -88,6 +88,12 @@ int _goldOfItem(Item item, ItemMaster master) {
   if (data == null) {
     return item.priceTotal;
   }
+
+  if (!data.gold.purchasable) {
+    // 英気満点ビスケットなど
+    return 0;
+  }
+
   return data.gold.total;
 }
 
@@ -97,8 +103,13 @@ double _powerOfItem(Item item, ItemMaster master) {
     return item.priceTotal.toDouble();
   }
 
+  if (!data.gold.purchasable) {
+    // 英気満点ビスケットなど
+    return 0.0;
+  }
+
   final price = data.gold.total.toDouble();
-  if (data.depth <= 0 || data.consumed) {
+  if (data.depth <= 0) {
     return price;
   }
 

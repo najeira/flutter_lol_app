@@ -6,3 +6,7 @@ final itemMasterProvider = FutureProvider<ItemMaster>((ref) async {
   final data = await loadItemMaster();
   return data;
 });
+
+final itemMasterValueProvider = Provider.autoDispose<ItemMaster?>((ref) {
+  return ref.watch(itemMasterProvider.select((data) => data.valueOrNull));
+});
