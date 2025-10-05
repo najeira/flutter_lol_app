@@ -44,20 +44,16 @@ class ChampionImage extends StatelessWidget {
     final assetPath = "assets/champion/${baseName}.png";
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: SizedBox(
+      child: Image.asset(
+        assetPath,
         width: size,
         height: size,
-        child: Image.asset(
-          assetPath,
-          width: size,
-          height: size,
-          fit: fit,
-          filterQuality: FilterQuality.medium,
-          errorBuilder: (context, error, stackTrace) {
-            // debugPrint(player.rawChampionName);
-            return _DefaultPlaceholder(size: size);
-          },
-        ),
+        fit: fit,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (context, error, stackTrace) {
+          // debugPrint(player.rawChampionName);
+          return _DefaultPlaceholder(size: size);
+        },
       ),
     );
   }

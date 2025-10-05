@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/player.dart';
 import '../providers/game.dart';
-import '../screens/team.dart';
+
+import 'team.dart';
 
 class LiveGameScreen extends StatelessWidget {
   const LiveGameScreen({super.key});
@@ -15,7 +16,7 @@ class LiveGameScreen extends StatelessWidget {
         title: const _AppBarText(),
         actions: const [_RefreshButton()],
       ),
-      body: const SingleChildScrollView(child: _Body()),
+      body: const _Body(),
     );
   }
 }
@@ -29,7 +30,10 @@ class _Body extends ConsumerWidget {
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => _ErrorView(error: e),
-      data: (data) => TeamsSideBySide(data),
+      data: (data) => Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+        child: TeamsVertical(data),
+      ),
     );
   }
 }
