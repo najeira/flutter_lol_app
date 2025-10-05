@@ -29,6 +29,7 @@ class GameDataNotifier extends AutoDisposeAsyncNotifier<AllGameData> {
       return AllGameData.fromJson(data);
     } catch (e, st) {
       debugPrint(e.toString());
+      debugPrint(st.toString());
       // 失敗: 次回のポーリング間隔を指数バックオフ
       final doubled = _interval.inSeconds * 2;
       final secs = math.min(doubled, _kMaxIntervalSecs);
