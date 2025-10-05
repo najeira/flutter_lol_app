@@ -6,7 +6,15 @@ import '../services/player.dart';
 
 import 'item.dart';
 
-final playersProvider = Provider.autoDispose<AsyncValue<List<PlayerData>>>((
+const _orderIndex = {
+  'TOP': 0,
+  'JUNGLE': 1,
+  'MIDDLE': 2,
+  'BOTTOM': 3,
+  'UTILITY': 4,
+};
+
+final _allPlayersProvider = Provider.autoDispose<AsyncValue<List<PlayerData>>>((
   ref,
 ) {
   final itemMaster = ref.watch(itemMasterProvider);
@@ -28,14 +36,6 @@ final playersProvider = Provider.autoDispose<AsyncValue<List<PlayerData>>>((
   );
 });
 
-const _orderIndex = {
-  'TOP': 0,
-  'JUNGLE': 1,
-  'MIDDLE': 2,
-  'BOTTOM': 3,
-  'UTILITY': 4,
-};
-
 extension PlayerExtension on Player {
   int get positionOrder {
     final pos = position.toUpperCase();
@@ -43,31 +43,47 @@ extension PlayerExtension on Player {
   }
 }
 
-/// playersProvider を監視し、team ごとにプレイヤーを分割し、
+class PlayersData {
+  const PlayersData({required this.blue, required this.red});
+
+  final List<PlayerData> blue;
+  final List<PlayerData> red;
+
+  bool get isEmpty {
+    return blue.isEmpty && red.isEmpty;
+  }
+}
+
+/// _allPlayersProvider を監視し、team ごとにプレイヤーを分割し、
 /// かつ position の順番でソートした結果を返します。
-final playersByTeamProvider =
-    Provider.autoDispose<AsyncValue<List<List<PlayerData>>>>((ref) {
-      final playersAsync = ref.watch(playersProvider);
-      return playersAsync.when(
-        data: (players) {
-          final grouped = <String, List<PlayerData>>{};
-          for (final pd in players) {
-            final team = pd.player.team.toUpperCase();
-            grouped.putIfAbsent(team, () => <PlayerData>[]).add(pd);
-          }
+final playersProvider = Provider.autoDispose<AsyncValue<PlayersData>>((
+  ref,
+) {
+  final playersAsync = ref.watch(_allPlayersProvider);
+  return playersAsync.when(
+    data: (players) {
+      final blue = <PlayerData>[];
+      final red = <PlayerData>[];
 
-          // Sort each team list by position order
-          final rows = grouped.values.toList();
-          for (final row in rows) {
-            row.sort(
-              (a, b) =>
-                  a.player.positionOrder.compareTo(b.player.positionOrder),
-            );
-          }
+      for (final p in players) {
+        final team = p.player.team.toUpperCase();
+        if (team == "ORDER") {
+          blue.add(p);
+        } else {
+          red.add(p);
+        }
+      }
 
-          return AsyncData(rows);
-        },
-        loading: () => const AsyncLoading(),
-        error: (e, st) => AsyncError(e, st),
-      );
-    });
+      // Sort each team list by position order
+      blue.sort(_compare);
+      red.sort(_compare);
+      return AsyncData(PlayersData(blue: blue, red: red));
+    },
+    loading: () => const AsyncLoading(),
+    error: (e, st) => AsyncError(e, st),
+  );
+});
+
+int _compare(PlayerData a, PlayerData b) {
+  return a.player.positionOrder.compareTo(b.player.positionOrder);
+}
