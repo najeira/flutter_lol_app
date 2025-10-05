@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -6,76 +7,74 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/all_game_data.dart';
 import '../services/game.dart';
 
-const _kRefreshInterval = Duration(seconds: 3);
+const _kRefreshInterval = Duration(seconds: 2);
+const _kMaxIntervalSecs = 30;
 
 // Emits latest game data by polling getAllGameData periodically.
-final gameDataProvider = StreamProvider.autoDispose<AllGameData>((ref) async* {
-  final controller = StreamController<AllGameData>();
+final gameDataProvider =
+    AsyncNotifierProvider.autoDispose<GameDataNotifier, AllGameData>(() {
+      return GameDataNotifier();
+    });
 
-  // one-shot timer to schedule next tick after current finishes
-  Timer? timer;
+class GameDataNotifier extends AutoDisposeAsyncNotifier<AllGameData> {
+  Timer? _timer;
+  Duration _interval = _kRefreshInterval;
 
-  // whether the polling loop should continue
-  bool running = false;
-
-  Future<void> tick() async {
-    await _fetch(controller);
-
-    // Schedule next tick only after the current one completes
-    if (running) {
-      timer?.cancel();
-      timer = Timer(_kRefreshInterval, tick);
+  @override
+  Future<AllGameData> build() async {
+    try {
+      final data = await getAllGameData();
+      // 成功したら間隔をリセット
+      _interval = _kRefreshInterval;
+      return AllGameData.fromJson(data);
+    } catch (e, st) {
+      debugPrint(e.toString());
+      // 失敗: 次回のポーリング間隔を指数バックオフ
+      final doubled = _interval.inSeconds * 2;
+      final secs = math.min(doubled, _kMaxIntervalSecs);
+      _interval = Duration(seconds: secs);
+      // エラーはそのまま投げる（UI で `error` として受け取れる）
+      Error.throwWithStackTrace(e, st);
+    } finally {
+      _scheduleNextRefresh();
     }
   }
 
-  Future<void> start() async {
-    if (!running) {
-      running = true;
-      await tick();
+  void _startTimer() {
+    // ignore: prefer_conditional_assignment
+    if (_timer == null) {
+      _timer = Timer(_interval, () {
+        // 自分自身を無効化して build をやり直す
+        ref.invalidateSelf();
+      });
     }
   }
 
-  void stop() {
-    running = false;
-    timer?.cancel();
-    timer = null;
+  void _cancelTimer() {
+    _timer?.cancel();
+    _timer = null;
   }
 
-  // 初回開始
-  await start();
+  void _scheduleNextRefresh() {
+    // 既存タイマーをキャンセルしてから再予約
+    _cancelTimer();
 
-  // 購読が無ければ停止
-  ref.onCancel(() {
-    stop();
-  });
+    // Provider 破棄時にタイマー後始末
+    ref.onDispose(_cancelTimer);
 
-  // 再購読で再開
-  ref.onResume(start);
+    // 購読が無ければ停止
+    ref.onCancel(_cancelTimer);
 
-  ref.onDispose(() {
-    stop();
-    controller.close();
-  });
+    // 再購読で再開
+    ref.onResume(_startTimer);
 
-  yield* controller.stream;
-});
-
-Future<void> _fetch(StreamController<AllGameData> controller) async {
-  // If the provider is disposed while a fetch is in-flight, the controller may be
-  // closed before we try to emit. Guard against adding to a closed controller.
-  if (controller.isClosed) {
-    return;
+    _startTimer();
   }
 
-  try {
-    final data = await getAllGameData();
-    if (!controller.isClosed) {
-      controller.add(AllGameData.fromJson(data));
-    }
-  } catch (e, st) {
-    debugPrint(e.toString());
-    if (!controller.isClosed) {
-      controller.addError(e, st);
-    }
+  // 手動で即時更新したいときに使えるヘルパー
+  void refreshNow() {
+    _cancelTimer();
+    _interval = _kRefreshInterval; // 次回は通常間隔から再開
+    ref.invalidateSelf();
   }
 }
