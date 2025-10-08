@@ -5,16 +5,11 @@
 // ones from the Live Client Data API. Unknown or extra fields in JSON are ignored.
 // Numeric fields are parsed as num (or double) to accommodate int/double values.
 
-import 'dart:convert';
-
 import '../utils/json.dart';
 import 'active_player.dart';
 import 'game_data.dart';
 import 'live_events.dart';
 import 'player.dart';
-
-AllGameData allGameDataFromJsonString(String source) =>
-    AllGameData.fromJson(asMap(json.decode(source)));
 
 class AllGameData {
   const AllGameData({
@@ -33,9 +28,9 @@ class AllGameData {
     final ap = _activePlayer(json);
     return AllGameData(
       activePlayer: ap == null ? null : ActivePlayer.fromJson(ap),
-      allPlayers: (json['allPlayers'] as List<dynamic>? ?? const [])
-          .map((e) => Player.fromJson(asMap(e)))
-          .toList(),
+      allPlayers: asList(
+        json['allPlayers'],
+      ).map((e) => Player.fromJson(asMap(e))).toList(),
       events: LiveEvents.fromJson(asMap(json['events'])),
       gameData: GameData.fromJson(asMap(json['gameData'])),
     );

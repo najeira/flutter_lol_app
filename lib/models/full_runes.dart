@@ -18,15 +18,15 @@ class FullRunes {
   final List<StatRune> statRunes;
 
   factory FullRunes.fromJson(Map<String, dynamic> json) => FullRunes(
-    generalRunes: (json['generalRunes'] as List<dynamic>? ?? const [])
-        .map((e) => Rune.fromJson(asMap(e)))
-        .toList(),
+    generalRunes: asList(
+      json['generalRunes'],
+    ).map((e) => Rune.fromJson(asMap(e))).toList(),
     keystone: Rune.fromJson(asMap(json['keystone'])),
     primaryRuneTree: Rune.fromJson(asMap(json['primaryRuneTree'])),
     secondaryRuneTree: Rune.fromJson(asMap(json['secondaryRuneTree'])),
-    statRunes: (json['statRunes'] as List<dynamic>? ?? const [])
-        .map((e) => StatRune.fromJson(asMap(e)))
-        .toList(),
+    statRunes: asList(
+      json['statRunes'],
+    ).map((e) => StatRune.fromJson(asMap(e))).toList(),
   );
 
   Map<String, dynamic> toJson() => {

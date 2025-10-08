@@ -7,9 +7,9 @@ class LiveEvents {
   final List<GameEvent> events;
 
   factory LiveEvents.fromJson(Map<String, dynamic> json) => LiveEvents(
-    events: (json['Events'] as List<dynamic>? ?? const [])
-        .map((e) => GameEvent.fromJson(asMap(e)))
-        .toList(),
+    events: asList(
+      json['Events'],
+    ).map((e) => GameEvent.fromJson(asMap(e))).toList(),
   );
 
   Map<String, dynamic> toJson() => {

@@ -51,9 +51,7 @@ class Player {
     championName: asString(json['championName']),
     isBot: asBool(json['isBot']),
     isDead: asBool(json['isDead']),
-    items: (json['items'] as List<dynamic>? ?? const [])
-        .map((e) => Item.fromJson(asMap(e)))
-        .toList(),
+    items: asList(json['items']).map((e) => Item.fromJson(asMap(e))).toList(),
     level: asInt(json['level']),
     position: asString(json['position']),
     rawChampionName: asString(json['rawChampionName']),

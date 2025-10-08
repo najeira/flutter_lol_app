@@ -55,11 +55,22 @@ Map<String, dynamic> asMap(
 ]) {
   if (value is Map<String, dynamic>) {
     return value;
-  }
-  if (value is Map) {
+  } else if (value is Map) {
     return value.map(
-      (key, dynamic entryValue) => MapEntry('$key', entryValue),
+      (key, entryValue) => MapEntry(key.toString(), entryValue),
     );
+  }
+  return defaultValue;
+}
+
+List<dynamic> asList(
+  dynamic value, [
+  List<dynamic> defaultValue = const <dynamic>[],
+]) {
+  if (value is List<dynamic>) {
+    return value;
+  } else if (value is List) {
+    return List<dynamic>.from(value);
   }
   return defaultValue;
 }
