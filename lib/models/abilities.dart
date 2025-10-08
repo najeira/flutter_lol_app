@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'ability_info.dart';
 
 class Abilities {
@@ -18,19 +19,19 @@ class Abilities {
   factory Abilities.fromJson(Map<String, dynamic> json) {
     // Keys could be uppercase Q/W/E/R or localized; we follow example.
     return Abilities(
-      q: AbilityInfo.fromJson((json['Q'] as Map<String, dynamic>? ?? const {})),
-      w: AbilityInfo.fromJson((json['W'] as Map<String, dynamic>? ?? const {})),
-      e: AbilityInfo.fromJson((json['E'] as Map<String, dynamic>? ?? const {})),
-      r: AbilityInfo.fromJson((json['R'] as Map<String, dynamic>? ?? const {})),
-      passive: AbilityInfo.fromJson((json['Passive'] as Map<String, dynamic>? ?? const {})),
+      q: AbilityInfo.fromJson(asMap(json['Q'])),
+      w: AbilityInfo.fromJson(asMap(json['W'])),
+      e: AbilityInfo.fromJson(asMap(json['E'])),
+      r: AbilityInfo.fromJson(asMap(json['R'])),
+      passive: AbilityInfo.fromJson(asMap(json['Passive'])),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'Q': q.toJson(),
-        'W': w.toJson(),
-        'E': e.toJson(),
-        'R': r.toJson(),
-        'Passive': passive.toJson(),
-      };
+    'Q': q.toJson(),
+    'W': w.toJson(),
+    'E': e.toJson(),
+    'R': r.toJson(),
+    'Passive': passive.toJson(),
+  };
 }

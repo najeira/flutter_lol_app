@@ -48,3 +48,18 @@ String asString(dynamic value, [String defaultValue = '']) {
   }
   return defaultValue;
 }
+
+Map<String, dynamic> asMap(
+  dynamic value, [
+  Map<String, dynamic> defaultValue = const <String, dynamic>{},
+]) {
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
+  if (value is Map) {
+    return value.map(
+      (key, dynamic entryValue) => MapEntry('$key', entryValue),
+    );
+  }
+  return defaultValue;
+}

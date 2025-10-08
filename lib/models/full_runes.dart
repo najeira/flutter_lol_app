@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'rune.dart';
 import 'stat_rune.dart';
 
@@ -17,24 +18,22 @@ class FullRunes {
   final List<StatRune> statRunes;
 
   factory FullRunes.fromJson(Map<String, dynamic> json) => FullRunes(
-        generalRunes: (json['generalRunes'] as List<dynamic>? ?? const [])
-            .map((e) => Rune.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        keystone: Rune.fromJson(json['keystone'] as Map<String, dynamic>),
-        primaryRuneTree:
-            Rune.fromJson(json['primaryRuneTree'] as Map<String, dynamic>),
-        secondaryRuneTree:
-            Rune.fromJson(json['secondaryRuneTree'] as Map<String, dynamic>),
-        statRunes: (json['statRunes'] as List<dynamic>? ?? const [])
-            .map((e) => StatRune.fromJson(e as Map<String, dynamic>))
-            .toList(),
-      );
+    generalRunes: (json['generalRunes'] as List<dynamic>? ?? const [])
+        .map((e) => Rune.fromJson(asMap(e)))
+        .toList(),
+    keystone: Rune.fromJson(asMap(json['keystone'])),
+    primaryRuneTree: Rune.fromJson(asMap(json['primaryRuneTree'])),
+    secondaryRuneTree: Rune.fromJson(asMap(json['secondaryRuneTree'])),
+    statRunes: (json['statRunes'] as List<dynamic>? ?? const [])
+        .map((e) => StatRune.fromJson(asMap(e)))
+        .toList(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'generalRunes': generalRunes.map((e) => e.toJson()).toList(),
-        'keystone': keystone.toJson(),
-        'primaryRuneTree': primaryRuneTree.toJson(),
-        'secondaryRuneTree': secondaryRuneTree.toJson(),
-        'statRunes': statRunes.map((e) => e.toJson()).toList(),
-      };
+    'generalRunes': generalRunes.map((e) => e.toJson()).toList(),
+    'keystone': keystone.toJson(),
+    'primaryRuneTree': primaryRuneTree.toJson(),
+    'secondaryRuneTree': secondaryRuneTree.toJson(),
+    'statRunes': statRunes.map((e) => e.toJson()).toList(),
+  };
 }

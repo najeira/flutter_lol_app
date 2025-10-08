@@ -16,18 +16,18 @@ class Scores {
   final double wardScore;
 
   factory Scores.fromJson(Map<String, dynamic> json) => Scores(
-        assists: asInt(json['assists']),
-        creepScore: asInt(json['creepScore']),
-        deaths: asInt(json['deaths']),
-        kills: asInt(json['kills']),
-        wardScore: asDouble(json['wardScore']),
-      );
+    assists: asInt(json['assists']),
+    creepScore: asInt(json['creepScore']),
+    deaths: asInt(json['deaths']),
+    kills: asInt(json['kills']),
+    wardScore: asDouble(json['wardScore']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'assists': assists,
-        'creepScore': creepScore,
-        'deaths': deaths,
-        'kills': kills,
-        'wardScore': wardScore,
-      };
+    'assists': assists,
+    'creepScore': creepScore,
+    'deaths': deaths,
+    'kills': kills,
+    'wardScore': wardScore,
+  };
 }

@@ -30,10 +30,10 @@ class ActivePlayer {
 
   factory ActivePlayer.fromJson(Map<String, dynamic> json) {
     return ActivePlayer(
-      abilities: Abilities.fromJson(json['abilities'] as Map<String, dynamic>),
-      championStats: ChampionStats.fromJson(json['championStats'] as Map<String, dynamic>),
+      abilities: Abilities.fromJson(asMap(json['abilities'])),
+      championStats: ChampionStats.fromJson(asMap(json['championStats'])),
       currentGold: asDouble(json['currentGold']),
-      fullRunes: FullRunes.fromJson(json['fullRunes'] as Map<String, dynamic>),
+      fullRunes: FullRunes.fromJson(asMap(json['fullRunes'])),
       level: asInt(json['level']),
       riotId: asString(json['riotId']),
       riotIdGameName: asString(json['riotIdGameName']),
@@ -44,15 +44,15 @@ class ActivePlayer {
   }
 
   Map<String, dynamic> toJson() => {
-        'abilities': abilities.toJson(),
-        'championStats': championStats.toJson(),
-        'currentGold': currentGold,
-        'fullRunes': fullRunes.toJson(),
-        'level': level,
-        'riotId': riotId,
-        'riotIdGameName': riotIdGameName,
-        'riotIdTagLine': riotIdTagLine,
-        'summonerName': summonerName,
-        'teamRelativeColors': teamRelativeColors,
-      };
+    'abilities': abilities.toJson(),
+    'championStats': championStats.toJson(),
+    'currentGold': currentGold,
+    'fullRunes': fullRunes.toJson(),
+    'level': level,
+    'riotId': riotId,
+    'riotIdGameName': riotIdGameName,
+    'riotIdTagLine': riotIdTagLine,
+    'summonerName': summonerName,
+    'teamRelativeColors': teamRelativeColors,
+  };
 }

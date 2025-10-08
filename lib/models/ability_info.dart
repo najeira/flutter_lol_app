@@ -26,10 +26,10 @@ class AbilityInfo {
   }
 
   Map<String, dynamic> toJson() => {
-        'abilityLevel': abilityLevel,
-        'displayName': displayName,
-        'id': id,
-        'rawDescription': rawDescription,
-        'rawDisplayName': rawDisplayName,
-      };
+    'abilityLevel': abilityLevel,
+    'displayName': displayName,
+    'id': id,
+    'rawDescription': rawDescription,
+    'rawDisplayName': rawDisplayName,
+  };
 }

@@ -7,12 +7,9 @@ class StatRune {
   final String rawDescription;
 
   factory StatRune.fromJson(Map<String, dynamic> json) => StatRune(
-        id: asInt(json['id']),
-        rawDescription: asString(json['rawDescription']),
-      );
+    id: asInt(json['id']),
+    rawDescription: asString(json['rawDescription']),
+  );
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'rawDescription': rawDescription,
-      };
+  Map<String, dynamic> toJson() => {'id': id, 'rawDescription': rawDescription};
 }

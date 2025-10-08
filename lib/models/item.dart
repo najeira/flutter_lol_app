@@ -24,26 +24,26 @@ class Item {
   final int slot;
 
   factory Item.fromJson(Map<String, dynamic> json) => Item(
-        canUse: asBool(json['canUse']),
-        consumable: asBool(json['consumable']),
-        count: asInt(json['count']),
-        displayName: asString(json['displayName']),
-        itemID: asInt(json['itemID']),
-        price: asInt(json['price']),
-        rawDescription: asString(json['rawDescription']),
-        rawDisplayName: asString(json['rawDisplayName']),
-        slot: asInt(json['slot']),
-      );
+    canUse: asBool(json['canUse']),
+    consumable: asBool(json['consumable']),
+    count: asInt(json['count']),
+    displayName: asString(json['displayName']),
+    itemID: asInt(json['itemID']),
+    price: asInt(json['price']),
+    rawDescription: asString(json['rawDescription']),
+    rawDisplayName: asString(json['rawDisplayName']),
+    slot: asInt(json['slot']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'canUse': canUse,
-        'consumable': consumable,
-        'count': count,
-        'displayName': displayName,
-        'itemID': itemID,
-        'price': price,
-        'rawDescription': rawDescription,
-        'rawDisplayName': rawDisplayName,
-        'slot': slot,
-      };
+    'canUse': canUse,
+    'consumable': consumable,
+    'count': count,
+    'displayName': displayName,
+    'itemID': itemID,
+    'price': price,
+    'rawDescription': rawDescription,
+    'rawDisplayName': rawDisplayName,
+    'slot': slot,
+  };
 }

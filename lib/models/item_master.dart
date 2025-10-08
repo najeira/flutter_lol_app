@@ -25,13 +25,12 @@ class ItemMaster {
   final Map<int, ItemData> data;
 
   factory ItemMaster.fromJson(Map<String, dynamic> json) {
-    final rawData =
-        (json['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final rawData = asMap(json['data']);
     final parsed = <int, ItemData>{};
     for (final entry in rawData.entries) {
       final id = int.tryParse(entry.key);
-      if (id != null && entry.value is Map<String, dynamic>) {
-        parsed[id] = ItemData.fromJson(entry.value as Map<String, dynamic>);
+      if (id != null && entry.value is Map) {
+        parsed[id] = ItemData.fromJson(asMap(entry.value));
       }
     }
     return ItemMaster(
@@ -102,7 +101,7 @@ class ItemData {
     colloq: asString(json['colloq']),
     into: _asIdList(json['into']),
     from: _asIdList(json['from']),
-    gold: ItemGold.fromJson(json['gold'] as Map<String, dynamic>? ?? const {}),
+    gold: ItemGold.fromJson(asMap(json['gold'])),
     tags:
         (json['tags'] as List?)?.whereType<String>().toList() ??
         const <String>[],
@@ -111,14 +110,12 @@ class ItemData {
     depth: asInt(json['depth']),
     stacks: asInt(json['stacks']),
     consumed: asBool(json['consumed']),
-    inStore: asBool(json['inStore'], defaultValue: true),
+    inStore: asBool(json['inStore'], true),
     hideFromAll: asBool(json['hideFromAll']),
     requiredAlly: asString(json['requiredAlly']),
     requiredChampion: asString(json['requiredChampion']),
     specialRecipe: asInt(json['specialRecipe']),
-    image: ItemImage.fromJson(
-      json['image'] as Map<String, dynamic>? ?? const {},
-    ),
+    image: ItemImage.fromJson(asMap(json['image'])),
   );
 
   Map<String, dynamic> toJson() => {
@@ -250,7 +247,7 @@ Future<ItemMaster> loadItemMaster({
   String assetPath = 'assets/item.json',
 }) async {
   final jsonStr = await rootBundle.loadString(assetPath);
-  final root = json.decode(jsonStr) as Map<String, dynamic>;
+  final root = asMap(json.decode(jsonStr));
   return ItemMaster.fromJson(root);
 }
 
