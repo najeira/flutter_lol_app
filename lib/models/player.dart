@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'item.dart';
 import 'scores.dart';
 import 'simple_runes.dart';
@@ -47,31 +48,29 @@ class Player {
   final String team;
 
   factory Player.fromJson(Map<String, dynamic> json) => Player(
-        championName: (json['championName'] as String?) ?? '',
-        isBot: (json['isBot'] as bool? ?? false),
-        isDead: (json['isDead'] as bool? ?? false),
+        championName: asString(json['championName']),
+        isBot: asBool(json['isBot']),
+        isDead: asBool(json['isDead']),
         items: (json['items'] as List<dynamic>? ?? const [])
             .map((e) => Item.fromJson(e as Map<String, dynamic>))
             .toList(),
-        level: (json['level'] as num?)?.toInt() ?? 0,
-        position: (json['position'] as String?) ?? '',
-        rawChampionName: (json['rawChampionName'] as String?) ?? '',
-        rawSkinName: (json['rawSkinName'] as String?) ?? '',
-        respawnTimer: (json['respawnTimer'] is num)
-            ? (json['respawnTimer'] as num).toDouble()
-            : 0.0,
-        riotId: (json['riotId'] as String?) ?? '',
-        riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
-        riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
+        level: asInt(json['level']),
+        position: asString(json['position']),
+        rawChampionName: asString(json['rawChampionName']),
+        rawSkinName: asString(json['rawSkinName']),
+        respawnTimer: asDouble(json['respawnTimer']),
+        riotId: asString(json['riotId']),
+        riotIdGameName: asString(json['riotIdGameName']),
+        riotIdTagLine: asString(json['riotIdTagLine']),
         runes: SimpleRunes.fromJson(json['runes'] as Map<String, dynamic>),
         scores: Scores.fromJson(json['scores'] as Map<String, dynamic>),
-        skinID: (json['skinID'] as num?)?.toInt() ?? 0,
-        skinName: (json['skinName'] as String?) ?? '',
-        summonerName: (json['summonerName'] as String?) ?? '',
+        skinID: asInt(json['skinID']),
+        skinName: asString(json['skinName']),
+        summonerName: asString(json['summonerName']),
         summonerSpells: SummonerSpells.fromJson(
           json['summonerSpells'] as Map<String, dynamic>,
         ),
-        team: (json['team'] as String?) ?? '',
+        team: asString(json['team']),
       );
 
   Map<String, dynamic> toJson() => {

@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'abilities.dart';
 import 'champion_stats.dart';
 import 'full_runes.dart';
@@ -31,14 +32,14 @@ class ActivePlayer {
     return ActivePlayer(
       abilities: Abilities.fromJson(json['abilities'] as Map<String, dynamic>),
       championStats: ChampionStats.fromJson(json['championStats'] as Map<String, dynamic>),
-      currentGold: (json['currentGold'] as num? ?? 0),
+      currentGold: asDouble(json['currentGold']),
       fullRunes: FullRunes.fromJson(json['fullRunes'] as Map<String, dynamic>),
-      level: (json['level'] as num? ?? 0).toInt(),
-      riotId: (json['riotId'] as String?) ?? '',
-      riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
-      riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
-      summonerName: (json['summonerName'] as String?) ?? '',
-      teamRelativeColors: (json['teamRelativeColors'] as bool?) ?? false,
+      level: asInt(json['level']),
+      riotId: asString(json['riotId']),
+      riotIdGameName: asString(json['riotIdGameName']),
+      riotIdTagLine: asString(json['riotIdTagLine']),
+      summonerName: asString(json['summonerName']),
+      teamRelativeColors: asBool(json['teamRelativeColors']),
     );
   }
 

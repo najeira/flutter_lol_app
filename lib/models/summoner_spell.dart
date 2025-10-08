@@ -1,3 +1,5 @@
+import '../utils/json.dart';
+
 class SummonerSpell {
   const SummonerSpell({required this.displayName, required this.rawDescription, required this.rawDisplayName});
 
@@ -6,9 +8,9 @@ class SummonerSpell {
   final String rawDisplayName;
 
   factory SummonerSpell.fromJson(Map<String, dynamic> json) => SummonerSpell(
-        displayName: (json['displayName'] as String?) ?? '',
-        rawDescription: (json['rawDescription'] as String?) ?? '',
-        rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
+        displayName: asString(json['displayName']),
+        rawDescription: asString(json['rawDescription']),
+        rawDisplayName: asString(json['rawDisplayName']),
       );
 
   Map<String, dynamic> toJson() => {

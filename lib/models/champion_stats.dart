@@ -1,3 +1,5 @@
+import '../utils/json.dart';
+
 class ChampionStats {
   const ChampionStats({
     required this.abilityHaste,
@@ -65,42 +67,39 @@ class ChampionStats {
   final double spellVamp;
   final double tenacity;
 
-  factory ChampionStats.fromJson(Map<String, dynamic> json) {
-    double d(dynamic v) => (v is num) ? v.toDouble() : 0.0;
-    return ChampionStats(
-      abilityHaste: d(json['abilityHaste']),
-      abilityPower: d(json['abilityPower']),
-      armor: d(json['armor']),
-      armorPenetrationFlat: d(json['armorPenetrationFlat']),
-      armorPenetrationPercent: d(json['armorPenetrationPercent']),
-      attackDamage: d(json['attackDamage']),
-      attackRange: d(json['attackRange']),
-      attackSpeed: d(json['attackSpeed']),
-      bonusArmorPenetrationPercent: d(json['bonusArmorPenetrationPercent']),
-      bonusMagicPenetrationPercent: d(json['bonusMagicPenetrationPercent']),
-      critChance: d(json['critChance']),
-      critDamage: d(json['critDamage']),
-      currentHealth: d(json['currentHealth']),
-      healShieldPower: d(json['healShieldPower']),
-      healthRegenRate: d(json['healthRegenRate']),
-      lifeSteal: d(json['lifeSteal']),
-      magicLethality: d(json['magicLethality']),
-      magicPenetrationFlat: d(json['magicPenetrationFlat']),
-      magicPenetrationPercent: d(json['magicPenetrationPercent']),
-      magicResist: d(json['magicResist']),
-      maxHealth: d(json['maxHealth']),
-      moveSpeed: d(json['moveSpeed']),
-      omnivamp: d(json['omnivamp']),
-      physicalLethality: d(json['physicalLethality']),
-      physicalVamp: d(json['physicalVamp']),
-      resourceMax: d(json['resourceMax']),
-      resourceRegenRate: d(json['resourceRegenRate']),
-      resourceType: (json['resourceType'] as String?) ?? '',
-      resourceValue: d(json['resourceValue']),
-      spellVamp: d(json['spellVamp']),
-      tenacity: d(json['tenacity']),
-    );
-  }
+  factory ChampionStats.fromJson(Map<String, dynamic> json) => ChampionStats(
+        abilityHaste: asDouble(json['abilityHaste']),
+        abilityPower: asDouble(json['abilityPower']),
+        armor: asDouble(json['armor']),
+        armorPenetrationFlat: asDouble(json['armorPenetrationFlat']),
+        armorPenetrationPercent: asDouble(json['armorPenetrationPercent']),
+        attackDamage: asDouble(json['attackDamage']),
+        attackRange: asDouble(json['attackRange']),
+        attackSpeed: asDouble(json['attackSpeed']),
+        bonusArmorPenetrationPercent: asDouble(json['bonusArmorPenetrationPercent']),
+        bonusMagicPenetrationPercent: asDouble(json['bonusMagicPenetrationPercent']),
+        critChance: asDouble(json['critChance']),
+        critDamage: asDouble(json['critDamage']),
+        currentHealth: asDouble(json['currentHealth']),
+        healShieldPower: asDouble(json['healShieldPower']),
+        healthRegenRate: asDouble(json['healthRegenRate']),
+        lifeSteal: asDouble(json['lifeSteal']),
+        magicLethality: asDouble(json['magicLethality']),
+        magicPenetrationFlat: asDouble(json['magicPenetrationFlat']),
+        magicPenetrationPercent: asDouble(json['magicPenetrationPercent']),
+        magicResist: asDouble(json['magicResist']),
+        maxHealth: asDouble(json['maxHealth']),
+        moveSpeed: asDouble(json['moveSpeed']),
+        omnivamp: asDouble(json['omnivamp']),
+        physicalLethality: asDouble(json['physicalLethality']),
+        physicalVamp: asDouble(json['physicalVamp']),
+        resourceMax: asDouble(json['resourceMax']),
+        resourceRegenRate: asDouble(json['resourceRegenRate']),
+        resourceType: asString(json['resourceType']),
+        resourceValue: asDouble(json['resourceValue']),
+        spellVamp: asDouble(json['spellVamp']),
+        tenacity: asDouble(json['tenacity']),
+      );
 
   Map<String, dynamic> toJson() => {
         'abilityHaste': abilityHaste,

@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../utils/json.dart';
+
 class WindowManagerListener with WindowListener {
   WindowManagerListener();
 
@@ -89,12 +91,12 @@ class WindowPreference {
 
   factory WindowPreference.fromJson(Map<String, dynamic> json) {
     return WindowPreference(
-      x: _toDouble(json['x']),
-      y: _toDouble(json['y']),
-      w: _toDouble(json['w']),
-      h: _toDouble(json['h']),
-      isMaximized: _toBool(json['max']),
-      isFullScreen: _toBool(json['full']),
+      x: asDouble(json['x']),
+      y: asDouble(json['y']),
+      w: asDouble(json['w']),
+      h: asDouble(json['h']),
+      isMaximized: asBool(json['max']),
+      isFullScreen: asBool(json['full']),
     );
   }
 
@@ -120,18 +122,4 @@ class WindowPreference {
     }
     return const WindowPreference();
   }
-}
-
-double _toDouble(dynamic v) {
-  if (v is num) {
-    return v.toDouble();
-  }
-  return 0.0;
-}
-
-bool _toBool(dynamic v) {
-  if (v is bool) {
-    return v;
-  }
-  return false;
 }

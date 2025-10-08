@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../utils/json.dart';
+
 /// LoL item master data model (parsed from assets/item.json).
 ///
 /// This is independent from the live client "AllGameData" models and only
@@ -33,8 +35,8 @@ class ItemMaster {
       }
     }
     return ItemMaster(
-      type: (json['type'] as String?) ?? '',
-      version: (json['version'] as String?) ?? '',
+      type: asString(json['type']),
+      version: asString(json['version']),
       data: parsed,
     );
   }
@@ -94,10 +96,10 @@ class ItemData {
   final ItemImage image;
 
   factory ItemData.fromJson(Map<String, dynamic> json) => ItemData(
-    name: (json['name'] as String?) ?? '',
-    description: (json['description'] as String?) ?? '',
-    plaintext: (json['plaintext'] as String?) ?? '',
-    colloq: (json['colloq'] as String?) ?? '',
+    name: asString(json['name']),
+    description: asString(json['description']),
+    plaintext: asString(json['plaintext']),
+    colloq: asString(json['colloq']),
     into: _asIdList(json['into']),
     from: _asIdList(json['from']),
     gold: ItemGold.fromJson(json['gold'] as Map<String, dynamic>? ?? const {}),
@@ -106,14 +108,14 @@ class ItemData {
         const <String>[],
     maps: _asBoolMap(json['maps']),
     stats: _asNumMap(json['stats']),
-    depth: (json['depth'] as num?)?.toInt() ?? 0,
-    stacks: (json['stacks'] as num?)?.toInt() ?? 0,
-    consumed: (json['consumed'] as bool?) ?? false,
-    inStore: (json['inStore'] as bool?) ?? true,
-    hideFromAll: (json['hideFromAll'] as bool?) ?? false,
-    requiredAlly: (json['requiredAlly'] as String?) ?? '',
-    requiredChampion: (json['requiredChampion'] as String?) ?? '',
-    specialRecipe: (json['specialRecipe'] as num?)?.toInt() ?? 0,
+    depth: asInt(json['depth']),
+    stacks: asInt(json['stacks']),
+    consumed: asBool(json['consumed']),
+    inStore: asBool(json['inStore'], defaultValue: true),
+    hideFromAll: asBool(json['hideFromAll']),
+    requiredAlly: asString(json['requiredAlly']),
+    requiredChampion: asString(json['requiredChampion']),
+    specialRecipe: asInt(json['specialRecipe']),
     image: ItemImage.fromJson(
       json['image'] as Map<String, dynamic>? ?? const {},
     ),
@@ -189,10 +191,10 @@ class ItemGold {
   final bool purchasable;
 
   factory ItemGold.fromJson(Map<String, dynamic> json) => ItemGold(
-    base: (json['base'] as num?)?.toInt() ?? 0,
-    total: (json['total'] as num?)?.toInt() ?? 0,
-    sell: (json['sell'] as num?)?.toInt() ?? 0,
-    purchasable: (json['purchasable'] as bool?) ?? false,
+    base: asInt(json['base']),
+    total: asInt(json['total']),
+    sell: asInt(json['sell']),
+    purchasable: asBool(json['purchasable']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -223,13 +225,13 @@ class ItemImage {
   final int h;
 
   factory ItemImage.fromJson(Map<String, dynamic> json) => ItemImage(
-    full: (json['full'] as String?) ?? '',
-    sprite: (json['sprite'] as String?) ?? '',
-    group: (json['group'] as String?) ?? '',
-    x: (json['x'] as num?)?.toInt() ?? 0,
-    y: (json['y'] as num?)?.toInt() ?? 0,
-    w: (json['w'] as num?)?.toInt() ?? 0,
-    h: (json['h'] as num?)?.toInt() ?? 0,
+    full: asString(json['full']),
+    sprite: asString(json['sprite']),
+    group: asString(json['group']),
+    x: asInt(json['x']),
+    y: asInt(json['y']),
+    w: asInt(json['w']),
+    h: asInt(json['h']),
   );
 
   Map<String, dynamic> toJson() => {

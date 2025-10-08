@@ -1,3 +1,5 @@
+import '../utils/json.dart';
+
 class AbilityInfo {
   const AbilityInfo({
     required this.abilityLevel,
@@ -15,11 +17,11 @@ class AbilityInfo {
 
   factory AbilityInfo.fromJson(Map<String, dynamic> json) {
     return AbilityInfo(
-      abilityLevel: (json['abilityLevel'] as num?)?.toInt() ?? 0,
-      displayName: (json['displayName'] as String?) ?? '',
-      id: (json['id'] as String?) ?? '',
-      rawDescription: (json['rawDescription'] as String?) ?? '',
-      rawDisplayName: (json['rawDisplayName'] as String?) ?? '',
+      abilityLevel: asInt(json['abilityLevel']),
+      displayName: asString(json['displayName']),
+      id: asString(json['id']),
+      rawDescription: asString(json['rawDescription']),
+      rawDisplayName: asString(json['rawDisplayName']),
     );
   }
 

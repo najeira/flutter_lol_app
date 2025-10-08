@@ -1,3 +1,5 @@
+import '../utils/json.dart';
+
 class Scores {
   const Scores({
     required this.assists,
@@ -14,12 +16,11 @@ class Scores {
   final double wardScore;
 
   factory Scores.fromJson(Map<String, dynamic> json) => Scores(
-        assists: (json['assists'] as num?)?.toInt() ?? 0,
-        creepScore: (json['creepScore'] as num?)?.toInt() ?? 0,
-        deaths: (json['deaths'] as num?)?.toInt() ?? 0,
-        kills: (json['kills'] as num?)?.toInt() ?? 0,
-        wardScore:
-            (json['wardScore'] is num) ? (json['wardScore'] as num).toDouble() : 0.0,
+        assists: asInt(json['assists']),
+        creepScore: asInt(json['creepScore']),
+        deaths: asInt(json['deaths']),
+        kills: asInt(json['kills']),
+        wardScore: asDouble(json['wardScore']),
       );
 
   Map<String, dynamic> toJson() => {
