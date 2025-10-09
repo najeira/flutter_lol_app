@@ -12,88 +12,7 @@ import '../services/player.dart';
 import 'champion_image.dart';
 import 'item_image.dart';
 
-/// Displays teams as columns placed horizontally side-by-side.
-class TeamsVertical extends StatelessWidget {
-  const TeamsVertical(this.data, {super.key});
-
-  /// players grouped by team, already sorted by position.
-  final PlayersData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final length = math.max(data.blue.length, data.red.length);
-    return ListView(
-      children: [for (int i = 0; i < length; i++) _build(data, i)],
-    );
-  }
-
-  Widget _build(PlayersData data, int index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        children: [
-          _buildPlayer(data.blue, index),
-          const SizedBox(width: 8.0),
-          _buildIndicator(data, index),
-          const SizedBox(width: 8.0),
-          _buildPlayer(data.red, index),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPlayer(List<PlayerData> players, int index) {
-    final player = players.elementAtOrNull(index);
-    if (player == null) {
-      return const Expanded(child: SizedBox.shrink());
-    }
-    return Expanded(child: _Player(data: player));
-  }
-
-  Widget _buildIndicator(PlayersData data, int index) {
-    return _Indicator(
-      blue: data.blue.elementAtOrNull(index),
-      red: data.red.elementAtOrNull(index),
-    );
-  }
-}
-
-/// Displays teams as rows stacked vertically.
-class TeamsHorizontal extends StatelessWidget {
-  const TeamsHorizontal(this.data, {super.key});
-
-  /// players grouped by team, already sorted by position.
-  final PlayersData data;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        _Team(players: data.blue),
-        const SizedBox(height: 8.0),
-        _Team(players: data.red),
-      ],
-    );
-  }
-}
-
-class _Team extends StatelessWidget {
-  const _Team({required this.players});
-
-  final List<PlayerData> players;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Widget> children = [];
-    for (var i = 0; i < players.length; i++) {
-      children.add(Expanded(child: _Player(data: players[i])));
-      if (i < players.length - 1) {
-        children.add(const SizedBox(width: 8.0));
-      }
-    }
-    return Row(children: children);
-  }
-}
+// --- Helper Widgets ---
 
 class _Indicator extends StatelessWidget {
   const _Indicator({super.key, required this.blue, required this.red});
@@ -203,7 +122,6 @@ class _Items extends ConsumerWidget {
     final itemMaster = ref.watch(itemMasterValueProvider);
 
     final values = items.map((item) {
-      // debugPrint(item.toJson().toString());
       if (item.consumable) {
         return null;
       }
@@ -217,8 +135,6 @@ class _Items extends ConsumerWidget {
         return null;
       } else if (data.gold.total <= 0) {
         return null;
-      } else if (data.gold.sell <= 0) {
-        // return null;
       } else if (data.tags.contains("Consumable")) {
         return null;
       }
@@ -305,6 +221,114 @@ class ChampionDeadOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(4.0),
       ),
       child: const Icon(Icons.close, color: Colors.white70, size: 28.0),
+    );
+  }
+}
+
+class _Team extends StatelessWidget {
+  const _Team({required this.players});
+
+  final List<PlayerData> players;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> children = [];
+    for (var i = 0; i < players.length; i++) {
+      children.add(Expanded(child: _Player(data: players[i])));
+      if (i < players.length - 1) {
+        children.add(const SizedBox(width: 8.0));
+      }
+    }
+    return Row(children: children);
+  }
+}
+
+// --- Main Layout Widgets ---
+
+/// Displays teams as columns placed horizontally side-by-side.
+class TeamsVertical extends StatelessWidget {
+  const TeamsVertical(this.data, {super.key});
+
+  /// players grouped by team, already sorted by position.
+  final PlayersData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final length = math.max(data.blue.length, data.red.length);
+    return ListView(
+      children: [for (int i = 0; i < length; i++) _build(data, i)],
+    );
+  }
+
+  Widget _build(PlayersData data, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          _buildPlayer(data.blue, index),
+          const SizedBox(width: 8.0),
+          _buildIndicator(data, index),
+          const SizedBox(width: 8.0),
+          _buildPlayer(data.red, index),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayer(List<PlayerData> players, int index) {
+    final player = players.elementAtOrNull(index);
+    if (player == null) {
+      return const Expanded(child: SizedBox.shrink());
+    }
+    return Expanded(child: _Player(data: player));
+  }
+
+  Widget _buildIndicator(PlayersData data, int index) {
+    return _Indicator(
+      blue: data.blue.elementAtOrNull(index),
+      red: data.red.elementAtOrNull(index),
+    );
+  }
+}
+
+/// Displays teams as rows stacked vertically.
+class TeamsHorizontal extends StatelessWidget {
+  const TeamsHorizontal(this.data, {super.key});
+
+  /// players grouped by team, already sorted by position.
+  final PlayersData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        _Team(players: data.blue),
+        const SizedBox(height: 8.0),
+        _Team(players: data.red),
+      ],
+    );
+  }
+}
+
+/// A widget that displays teams in a responsive layout.
+///
+/// It switches between [TeamsVertical] and [TeamsHorizontal] based on the
+/// available width.
+class ResponsiveTeamsLayout extends StatelessWidget {
+  const ResponsiveTeamsLayout({super.key, required this.data});
+
+  final PlayersData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 800) {
+          return TeamsHorizontal(data);
+        } else {
+          return TeamsVertical(data);
+        }
+      },
     );
   }
 }
