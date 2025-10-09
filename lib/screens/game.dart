@@ -32,7 +32,15 @@ class _Body extends ConsumerWidget {
       error: (e, _) => _ErrorView(error: e),
       data: (data) => Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-        child: TeamsVertical(data),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth > 800) {
+              return TeamsHorizontal(data);
+            } else {
+              return TeamsVertical(data);
+            }
+          },
+        ),
       ),
     );
   }

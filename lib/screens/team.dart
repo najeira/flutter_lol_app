@@ -31,10 +31,11 @@ class TeamsVertical extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
-        spacing: 8.0,
         children: [
           _buildPlayer(data.blue, index),
+          const SizedBox(width: 8.0),
           _buildIndicator(data, index),
+          const SizedBox(width: 8.0),
           _buildPlayer(data.red, index),
         ],
       ),
@@ -44,7 +45,7 @@ class TeamsVertical extends StatelessWidget {
   Widget _buildPlayer(List<PlayerData> players, int index) {
     final player = players.elementAtOrNull(index);
     if (player == null) {
-      return SizedBox.shrink();
+      return const Expanded(child: SizedBox.shrink());
     }
     return Expanded(child: _Player(data: player));
   }
@@ -54,6 +55,43 @@ class TeamsVertical extends StatelessWidget {
       blue: data.blue.elementAtOrNull(index),
       red: data.red.elementAtOrNull(index),
     );
+  }
+}
+
+/// Displays teams as rows stacked vertically.
+class TeamsHorizontal extends StatelessWidget {
+  const TeamsHorizontal(this.data, {super.key});
+
+  /// players grouped by team, already sorted by position.
+  final PlayersData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        _Team(players: data.blue),
+        const SizedBox(height: 8.0),
+        _Team(players: data.red),
+      ],
+    );
+  }
+}
+
+class _Team extends StatelessWidget {
+  const _Team({required this.players});
+
+  final List<PlayerData> players;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> children = [];
+    for (var i = 0; i < players.length; i++) {
+      children.add(Expanded(child: _Player(data: players[i])));
+      if (i < players.length - 1) {
+        children.add(const SizedBox(width: 8.0));
+      }
+    }
+    return Row(children: children);
   }
 }
 
