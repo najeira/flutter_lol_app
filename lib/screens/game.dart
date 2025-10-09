@@ -32,7 +32,7 @@ class _Body extends ConsumerWidget {
       error: (e, _) => _ErrorView(error: e),
       data: (data) => Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-        child: ResponsiveTeamsLayout(data: data),
+        child: TeamsResponsive(data: data),
       ),
     );
   }
