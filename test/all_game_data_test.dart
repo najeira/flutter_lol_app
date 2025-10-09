@@ -3,11 +3,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_lol_app/models/all_game_data.dart';
-import 'package:flutter_lol_app/models/active_player.dart';
 
 void main() {
   test('Decode allgamedata.json into AllGameData model', () async {
-    final file = File('allgamedata.json');
+    final file = File('sample/allgamedata.json');
     expect(await file.exists(), isTrue, reason: 'allgamedata.json must exist at repo root');
 
     final jsonStr = await file.readAsString();

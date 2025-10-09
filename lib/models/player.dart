@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'item.dart';
 import 'scores.dart';
 import 'simple_runes.dart';
@@ -47,52 +48,46 @@ class Player {
   final String team;
 
   factory Player.fromJson(Map<String, dynamic> json) => Player(
-        championName: (json['championName'] as String?) ?? '',
-        isBot: (json['isBot'] as bool? ?? false),
-        isDead: (json['isDead'] as bool? ?? false),
-        items: (json['items'] as List<dynamic>? ?? const [])
-            .map((e) => Item.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        level: (json['level'] as num?)?.toInt() ?? 0,
-        position: (json['position'] as String?) ?? '',
-        rawChampionName: (json['rawChampionName'] as String?) ?? '',
-        rawSkinName: (json['rawSkinName'] as String?) ?? '',
-        respawnTimer: (json['respawnTimer'] is num)
-            ? (json['respawnTimer'] as num).toDouble()
-            : 0.0,
-        riotId: (json['riotId'] as String?) ?? '',
-        riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
-        riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
-        runes: SimpleRunes.fromJson(json['runes'] as Map<String, dynamic>),
-        scores: Scores.fromJson(json['scores'] as Map<String, dynamic>),
-        skinID: (json['skinID'] as num?)?.toInt() ?? 0,
-        skinName: (json['skinName'] as String?) ?? '',
-        summonerName: (json['summonerName'] as String?) ?? '',
-        summonerSpells: SummonerSpells.fromJson(
-          json['summonerSpells'] as Map<String, dynamic>,
-        ),
-        team: (json['team'] as String?) ?? '',
-      );
+    championName: asString(json['championName']),
+    isBot: asBool(json['isBot']),
+    isDead: asBool(json['isDead']),
+    items: asList(json['items']).map((e) => Item.fromJson(asMap(e))).toList(),
+    level: asInt(json['level']),
+    position: asString(json['position']),
+    rawChampionName: asString(json['rawChampionName']),
+    rawSkinName: asString(json['rawSkinName']),
+    respawnTimer: asDouble(json['respawnTimer']),
+    riotId: asString(json['riotId']),
+    riotIdGameName: asString(json['riotIdGameName']),
+    riotIdTagLine: asString(json['riotIdTagLine']),
+    runes: SimpleRunes.fromJson(asMap(json['runes'])),
+    scores: Scores.fromJson(asMap(json['scores'])),
+    skinID: asInt(json['skinID']),
+    skinName: asString(json['skinName']),
+    summonerName: asString(json['summonerName']),
+    summonerSpells: SummonerSpells.fromJson(asMap(json['summonerSpells'])),
+    team: asString(json['team']),
+  );
 
   Map<String, dynamic> toJson() => {
-        'championName': championName,
-        'isBot': isBot,
-        'isDead': isDead,
-        'items': items.map((e) => e.toJson()).toList(),
-        'level': level,
-        'position': position,
-        'rawChampionName': rawChampionName,
-        'rawSkinName': rawSkinName,
-        'respawnTimer': respawnTimer,
-        'riotId': riotId,
-        'riotIdGameName': riotIdGameName,
-        'riotIdTagLine': riotIdTagLine,
-        'runes': runes.toJson(),
-        'scores': scores.toJson(),
-        'skinID': skinID,
-        'skinName': skinName,
-        'summonerName': summonerName,
-        'summonerSpells': summonerSpells.toJson(),
-        'team': team,
-      };
+    'championName': championName,
+    'isBot': isBot,
+    'isDead': isDead,
+    'items': items.map((e) => e.toJson()).toList(),
+    'level': level,
+    'position': position,
+    'rawChampionName': rawChampionName,
+    'rawSkinName': rawSkinName,
+    'respawnTimer': respawnTimer,
+    'riotId': riotId,
+    'riotIdGameName': riotIdGameName,
+    'riotIdTagLine': riotIdTagLine,
+    'runes': runes.toJson(),
+    'scores': scores.toJson(),
+    'skinID': skinID,
+    'skinName': skinName,
+    'summonerName': summonerName,
+    'summonerSpells': summonerSpells.toJson(),
+    'team': team,
+  };
 }

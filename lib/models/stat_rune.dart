@@ -1,3 +1,5 @@
+import '../utils/json.dart';
+
 class StatRune {
   const StatRune({required this.id, required this.rawDescription});
 
@@ -5,12 +7,9 @@ class StatRune {
   final String rawDescription;
 
   factory StatRune.fromJson(Map<String, dynamic> json) => StatRune(
-        id: (json['id'] as num?)?.toInt() ?? 0,
-        rawDescription: (json['rawDescription'] as String?) ?? '',
-      );
+    id: asInt(json['id']),
+    rawDescription: asString(json['rawDescription']),
+  );
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'rawDescription': rawDescription,
-      };
+  Map<String, dynamic> toJson() => {'id': id, 'rawDescription': rawDescription};
 }

@@ -1,3 +1,4 @@
+import '../utils/json.dart';
 import 'abilities.dart';
 import 'champion_stats.dart';
 import 'full_runes.dart';
@@ -29,29 +30,29 @@ class ActivePlayer {
 
   factory ActivePlayer.fromJson(Map<String, dynamic> json) {
     return ActivePlayer(
-      abilities: Abilities.fromJson(json['abilities'] as Map<String, dynamic>),
-      championStats: ChampionStats.fromJson(json['championStats'] as Map<String, dynamic>),
-      currentGold: (json['currentGold'] as num? ?? 0),
-      fullRunes: FullRunes.fromJson(json['fullRunes'] as Map<String, dynamic>),
-      level: (json['level'] as num? ?? 0).toInt(),
-      riotId: (json['riotId'] as String?) ?? '',
-      riotIdGameName: (json['riotIdGameName'] as String?) ?? '',
-      riotIdTagLine: (json['riotIdTagLine'] as String?) ?? '',
-      summonerName: (json['summonerName'] as String?) ?? '',
-      teamRelativeColors: (json['teamRelativeColors'] as bool?) ?? false,
+      abilities: Abilities.fromJson(asMap(json['abilities'])),
+      championStats: ChampionStats.fromJson(asMap(json['championStats'])),
+      currentGold: asDouble(json['currentGold']),
+      fullRunes: FullRunes.fromJson(asMap(json['fullRunes'])),
+      level: asInt(json['level']),
+      riotId: asString(json['riotId']),
+      riotIdGameName: asString(json['riotIdGameName']),
+      riotIdTagLine: asString(json['riotIdTagLine']),
+      summonerName: asString(json['summonerName']),
+      teamRelativeColors: asBool(json['teamRelativeColors']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'abilities': abilities.toJson(),
-        'championStats': championStats.toJson(),
-        'currentGold': currentGold,
-        'fullRunes': fullRunes.toJson(),
-        'level': level,
-        'riotId': riotId,
-        'riotIdGameName': riotIdGameName,
-        'riotIdTagLine': riotIdTagLine,
-        'summonerName': summonerName,
-        'teamRelativeColors': teamRelativeColors,
-      };
+    'abilities': abilities.toJson(),
+    'championStats': championStats.toJson(),
+    'currentGold': currentGold,
+    'fullRunes': fullRunes.toJson(),
+    'level': level,
+    'riotId': riotId,
+    'riotIdGameName': riotIdGameName,
+    'riotIdTagLine': riotIdTagLine,
+    'summonerName': summonerName,
+    'teamRelativeColors': teamRelativeColors,
+  };
 }
