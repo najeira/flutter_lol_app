@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/player.dart';
+import '../utils/num.dart';
 import 'indicator_icon.dart';
 
 class TeamIndicator extends StatelessWidget {
@@ -27,7 +28,7 @@ class TeamIndicator extends StatelessWidget {
     final label = (diff / 1000.0).abs().toStringAsFixed(1);
 
     final icon = IndicatorIcon(
-      ratio: blue!.power / red!.power,
+      ratio: safeRatio(blue!.power, red!.power),
       size: 14.0,
     );
     final children = [

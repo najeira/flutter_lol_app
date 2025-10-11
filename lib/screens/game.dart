@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/game.dart';
 import '../providers/player.dart';
+import '../utils/num.dart';
 import 'error_view.dart';
 import 'indicator_icon.dart';
 import 'team.dart';
@@ -71,9 +72,10 @@ class _AppBarText extends ConsumerWidget {
     final future = ref.watch(playersProvider);
     return future.when(
       data: (data) {
-        final bluePower = data.blue.fold(1.0, (a, pd) => a + pd.power);
-        final redPower = data.red.fold(1.0, (a, pd) => a + pd.power);
-        final ratio = bluePower / redPower;
+        final ratio = safeRatio(
+          data.blue.fold(0.0, (a, pd) => a + pd.power),
+          data.red.fold(0.0, (a, pd) => a + pd.power),
+        );
 
         final blueGold = data.blue.fold(0, (a, pd) => a + pd.gold);
         final redGold = data.red.fold(0, (a, pd) => a + pd.gold);
