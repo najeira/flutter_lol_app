@@ -42,13 +42,14 @@ class PlayerCard extends StatelessWidget {
         border: Border.all(color: color, width: bw),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ChampionName(data: data),
-          const SizedBox(height: 2.0),
+          const SizedBox(height: 4.0),
           _ChampionIcon(data: data),
           const SizedBox(height: 4.0),
-          _Items(data.player.items),
+          _Items(items: data.player.items),
         ],
       ),
     );
@@ -56,7 +57,10 @@ class PlayerCard extends StatelessWidget {
 }
 
 class _Items extends ConsumerWidget {
-  const _Items(this.items);
+  const _Items({
+    super.key,
+    required this.items,
+  });
 
   final List<Item> items;
 
@@ -90,7 +94,7 @@ class _Items extends ConsumerWidget {
         minHeight: 24.0,
       ),
       child: Wrap(
-        runAlignment: WrapAlignment.end,
+        // runAlignment: WrapAlignment.end,
         crossAxisAlignment: WrapCrossAlignment.end,
         spacing: 2.0,
         runSpacing: 2.0,
@@ -110,12 +114,19 @@ class _ChampionName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = data.player.isDead ? Colors.white54 : null;
-    return Text(
-      data.player.championName,
-      maxLines: 1,
-      overflow: TextOverflow.clip,
-      style: theme.textTheme.labelSmall?.copyWith(color: color),
+    return Row(
+      children: [
+        _ScoreLabel(data: data),
+        const SizedBox(width: 4.0),
+        Expanded(
+          child: Text(
+            data.player.championName,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            style: theme.textTheme.labelMedium,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -134,15 +145,15 @@ class _ChampionIcon extends StatelessWidget {
     return Stack(
       children: [
         ChampionImage(player: data.player),
-        Positioned(
-          top: 0.0,
-          left: 0.0,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 0.0),
-            color: Colors.black38,
-            child: Text("${data.value}", style: labelStyle),
-          ),
-        ),
+        // Positioned(
+        //   top: 0.0,
+        //   left: 0.0,
+        //   child: Container(
+        //     padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 0.0),
+        //     color: Colors.black38,
+        //     child: Text("${data.value}", style: labelStyle),
+        //   ),
+        // ),
         Positioned(
           bottom: 0.0,
           right: 0.0,
@@ -170,6 +181,63 @@ class _ChampionDeadOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(4.0),
       ),
       child: const Icon(Icons.close, color: Colors.white70, size: 28.0),
+    );
+  }
+}
+
+class _ScoreLabel extends StatelessWidget {
+  const _ScoreLabel({required this.data});
+
+  final PlayerData data;
+
+  FontWeight get weight {
+    switch (data.value) {
+      case > 60:
+        return FontWeight.w600;
+      case > 55:
+        return FontWeight.w500;
+      case < 40:
+        return FontWeight.w200;
+      case < 45:
+        return FontWeight.w300;
+      default:
+        return FontWeight.normal;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final diff = (data.value - 50).toDouble();
+    final textColor = Color.fromARGB(
+      0xFF,
+      0xFF,
+      0xFF,
+      0xFF - (diff * 10.0).clamp(0.0, 255.0).floor(),
+    );
+
+    return Container(
+      height: 18.0,
+      width: 20.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4.0),
+        border: Border.all(
+          color: Colors.white60,
+          width: 0.5,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          "${data.value}",
+          maxLines: 1,
+          overflow: TextOverflow.clip,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: textColor,
+            fontWeight: weight,
+          ),
+        ),
+      ),
     );
   }
 }
