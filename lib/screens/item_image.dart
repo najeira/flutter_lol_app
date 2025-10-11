@@ -29,22 +29,20 @@ class ItemIcon extends StatelessWidget {
     }
   }
 
-  Color? get borderColor {
+  Border? get border {
     switch (item.rare) {
       case 3:
-        return Colors.yellowAccent;
+        return Border.all(color: Colors.yellowAccent, width: 1.0);
+      case 2:
+        return Border.all(color: Colors.white60, width: 0.5);
       default:
-        return null;
+        return Border.all(color: Colors.white24, width: 0.5);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final size = this.size;
-    final borderColor = this.borderColor;
-    final border = borderColor != null
-        ? Border.all(color: borderColor, width: 1.0)
-        : null;
     final radius = BorderRadius.circular(borderRadius);
 
     return Container(

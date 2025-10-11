@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
-
 import '../models/all_game_data.dart';
 import '../models/item.dart';
 import '../models/item_master.dart';
@@ -36,11 +34,14 @@ List<PlayerData> computePlayersPower(
       .toList(growable: false);
 
   // 平均値
-  final totalPower = _sum(powers, (e) => e.total).toInt();
+  final totalPower = _sum(powers, (e) => e.total.toDouble());
   final averagePower = totalPower / powers.length;
 
   // 各スコアと平均値との差の2乗の合計（分散の分子）を求める
-  final varianceSum = _sum(powers, (e) => math.pow(e.total - averagePower, 2));
+  final varianceSum = _sum(
+    powers,
+    (e) => math.pow(e.total - averagePower, 2).toDouble(),
+  );
 
   // 分散
   final variance = varianceSum / powers.length;
@@ -151,8 +152,8 @@ double _deviation(int score, double mean, double stddev) {
   return (score.toDouble() - mean) / safeStddev * 10.0 + 50.0;
 }
 
-num _sum<T>(Iterable<T> list, num Function(T element) calc) {
-  return list.fold(0, (total, element) {
+double _sum<T>(Iterable<T> list, double Function(T element) calc) {
+  return list.fold(0.0, (total, element) {
     return total + calc(element);
   });
 }
