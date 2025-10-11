@@ -7,6 +7,12 @@ build:
 test:
   flutter test
 
+format:
+  dart format .
+
+analyze:
+  flutter analyze
+
 gen:
   dart run build_runner build --delete-conflicting-outputs
 

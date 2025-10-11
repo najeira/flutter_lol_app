@@ -40,25 +40,24 @@ class ItemIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final assetPath = 'assets/item/${item.image.full}';
-
     final size = this.size;
     final borderColor = this.borderColor;
     final border = borderColor != null
         ? Border.all(color: borderColor, width: 1.0)
         : null;
+    final radius = BorderRadius.circular(borderRadius);
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: radius,
         border: border,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: radius,
         child: Image.asset(
-          assetPath,
+          "assets/item/${item.image.full}",
           width: size,
           height: size,
           fit: fit,
@@ -78,13 +77,10 @@ class _Placeholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      color: Colors.grey.shade300,
+    return Center(
       child: Icon(
-        Icons.inventory_2_outlined,
+        Icons.dangerous_outlined,
         size: size * 0.6,
-        color: Colors.grey.shade600,
       ),
     );
   }

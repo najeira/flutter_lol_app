@@ -26,19 +26,21 @@ List<PlayerData> computePlayersPower(
   AllGameData allGameData,
   ItemMaster itemMaster,
 ) {
+  if (allGameData.allPlayers.isEmpty) {
+    return [];
+  }
+
   // まず全プレイヤーのパワーを計算
-  final powers = allGameData.allPlayers.map(
-    (p) => _computePlayerPower(p, itemMaster),
-  );
+  final powers = allGameData.allPlayers
+      .map((p) => _computePlayerPower(p, itemMaster))
+      .toList(growable: false);
 
   // 平均値
-  final totalPower = powers.fold(0.0, (a, b) => a + b.total);
+  final totalPower = _sum(powers, (e) => e.total).toInt();
   final averagePower = totalPower / powers.length;
 
   // 各スコアと平均値との差の2乗の合計（分散の分子）を求める
-  final varianceSum = powers
-      .map((e) => math.pow(e.total - averagePower, 2))
-      .reduce((a, b) => a + b);
+  final varianceSum = _sum(powers, (e) => math.pow(e.total - averagePower, 2));
 
   // 分散
   final variance = varianceSum / powers.length;
@@ -46,13 +48,14 @@ List<PlayerData> computePlayersPower(
   // 標準偏差
   final stddev = math.sqrt(variance);
 
-  return powers.mapIndexed((i, e) {
-    final player = allGameData.allPlayers[i];
+  return List<PlayerData>.generate(powers.length, (index) {
+    final player = allGameData.allPlayers[index];
+    final power = powers[index];
     return PlayerData(
       player: player,
-      power: e.total,
-      gold: e.gold,
-      value: _deviation(e.total, averagePower, stddev).round(),
+      power: power.total,
+      gold: power.gold,
+      value: _deviation(power.total, averagePower, stddev).round(),
     );
   }).toList();
 }
@@ -146,4 +149,10 @@ double _deviation(int score, double mean, double stddev) {
   const floor = 500.0;
   final safeStddev = math.max(stddev, floor);
   return (score.toDouble() - mean) / safeStddev * 10.0 + 50.0;
+}
+
+num _sum<T>(Iterable<T> list, num Function(T element) calc) {
+  return list.fold(0, (total, element) {
+    return total + calc(element);
+  });
 }

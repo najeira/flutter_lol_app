@@ -29,13 +29,21 @@ final _allPlayersProvider = Provider.autoDispose<AsyncValue<List<PlayerData>>>((
       skipLoadingOnRefresh: true,
       skipError: true,
       data: (gd) => AsyncData(computePlayersPower(gd, im)),
-      loading: () => AsyncLoading(),
-      error: (error, stackTrace) => AsyncError(error, stackTrace),
+      loading: _onLoading,
+      error: _onError,
     ),
-    loading: () => AsyncLoading(),
-    error: (error, stackTrace) => AsyncError(error, stackTrace),
+    loading: _onLoading,
+    error: _onError,
   );
 });
+
+AsyncLoading<T> _onLoading<T>() {
+  return const AsyncLoading();
+}
+
+AsyncError<T> _onError<T>(Object error, StackTrace stackTrace) {
+  return AsyncError(error, stackTrace);
+}
 
 extension PlayerExtension on Player {
   int get positionOrder {
