@@ -29,8 +29,8 @@ class PlayerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final diff = (data.value - 50).toDouble();
-    final bg = (100.0 + (diff * 5.0)).clamp(0.0, 255.0);
-    final bw = (diff / 3.0).clamp(0.0, 8.0);
+    final bg = (100.0 + (diff * 6.0)).clamp(0.0, 255.0);
+    final bw = (diff / 2.0).clamp(0.0, 8.0);
 
     final color = _teamColor;
 
@@ -38,7 +38,7 @@ class PlayerCard extends StatelessWidget {
       padding: EdgeInsets.all(8.0 - bw),
       decoration: BoxDecoration(
         color: color.withAlpha(bg.floor()),
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(8.0),
         border: Border.all(color: color, width: bw),
       ),
       child: Column(
@@ -85,13 +85,19 @@ class _Items extends ConsumerWidget {
       return data;
     }).nonNulls;
 
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.end,
-      spacing: 2.0,
-      runSpacing: 2.0,
-      children: [
-        for (final value in values) ItemIcon(item: value),
-      ],
+    return Container(
+      constraints: BoxConstraints(
+        minHeight: 24.0,
+      ),
+      child: Wrap(
+        runAlignment: WrapAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        spacing: 2.0,
+        runSpacing: 2.0,
+        children: [
+          for (final value in values) ItemIcon(item: value),
+        ],
+      ),
     );
   }
 }
@@ -104,7 +110,7 @@ class _ChampionName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = data.player.isDead ? Colors.black54 : null;
+    final color = data.player.isDead ? Colors.white54 : null;
     return Text(
       data.player.championName,
       maxLines: 1,
