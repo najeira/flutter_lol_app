@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../providers/player.dart';
-import '../utils/team_power_style.dart';
+import '../services/player.dart';
+import 'indicator_icon.dart';
 
-class TeamPowerIndicator extends StatelessWidget {
-  const TeamPowerIndicator({
+class TeamIndicator extends StatelessWidget {
+  const TeamIndicator({
     super.key,
     required this.blue,
     required this.red,
@@ -25,31 +25,33 @@ class TeamPowerIndicator extends StatelessWidget {
 
     final diff = blue!.power - red!.power;
     final label = (diff / 1000.0).abs().toStringAsFixed(1);
-    final icon = createPlayerIndicatorIcon(diff);
+
+    final icon = IndicatorIcon(
+      ratio: blue!.power / red!.power,
+      size: 14.0,
+    );
+    final children = [
+      icon,
+      const SizedBox(width: 2.0),
+      Text(
+        label,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: icon.blue
+              ? Colors.blue
+              : (icon.red ? Colors.red : Colors.white70),
+        ),
+      ),
+    ];
 
     if (vertical) {
       return Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(height: 2.0),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(color: icon.color),
-          ),
-        ],
+        children: children,
       );
     }
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        icon,
-        const SizedBox(width: 2.0),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(color: icon.color),
-        ),
-      ],
+      children: children,
     );
   }
 }

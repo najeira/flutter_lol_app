@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/game.dart';
 import '../providers/player.dart';
-import '../utils/team_power_style.dart';
-import '../widgets/error_view.dart';
+import 'error_view.dart';
+import 'indicator_icon.dart';
 import 'team.dart';
 
 class LiveGameScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class LiveGameScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const _AppBarText(),
-        actions: [_RefreshButton()],
+        actions: const [_RefreshButton()],
       ),
       body: const _Body(),
     );
@@ -39,8 +39,31 @@ class _Body extends ConsumerWidget {
   }
 }
 
+// A record to hold the font weights for both teams.
+typedef _FontWeights = ({FontWeight blue, FontWeight red});
+
 class _AppBarText extends ConsumerWidget {
   const _AppBarText();
+
+  /// Calculates the font weights for the app bar based on the team power ratio.
+  static _FontWeights _fontWeights(double ratio) {
+    switch (ratio) {
+      case > 1.15:
+        return (blue: FontWeight.w800, red: FontWeight.w200);
+      case > 1.10:
+        return (blue: FontWeight.w700, red: FontWeight.w300);
+      case > 1.05:
+        return (blue: FontWeight.w600, red: FontWeight.w400);
+      case < 0.85:
+        return (blue: FontWeight.w200, red: FontWeight.w800);
+      case < 0.90:
+        return (blue: FontWeight.w300, red: FontWeight.w700);
+      case < 0.95:
+        return (blue: FontWeight.w400, red: FontWeight.w600);
+      default:
+        return (blue: FontWeight.normal, red: FontWeight.normal);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,8 +80,11 @@ class _AppBarText extends ConsumerWidget {
         final blueGoldK = blueGold / 1000.0;
         final redGoldK = redGold / 1000.0;
 
-        final fontWeights = calculateAppBarFontWeights(ratio);
-        final icon = createAppbarIcon(ratio);
+        final fontWeights = _fontWeights(ratio);
+        final icon = IndicatorIcon(
+          ratio: ratio,
+          size: 16.0,
+        );
 
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -102,4 +128,3 @@ class _RefreshButton extends ConsumerWidget {
     );
   }
 }
-

@@ -2,18 +2,21 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/player.dart';
-import '../widgets/player_card.dart';
-import '../widgets/team_power_indicator.dart';
+import '../services/player.dart';
+import 'player_card.dart';
+import 'team_indicator.dart';
 
 /// A widget that displays teams in a responsive layout.
 ///
 /// It switches between [TeamsVertical] and [TeamsHorizontal] based on the
 /// available width.
 class TeamsResponsive extends StatelessWidget {
-  const TeamsResponsive({super.key, required this.data});
+  const TeamsResponsive({
+    super.key,
+    required this.data,
+  });
 
   final PlayersData data;
 
@@ -33,7 +36,10 @@ class TeamsResponsive extends StatelessWidget {
 
 /// Displays teams as columns placed horizontally side-by-side.
 class TeamsVertical extends StatelessWidget {
-  const TeamsVertical(this.data, {super.key});
+  const TeamsVertical(
+    this.data, {
+    super.key,
+  });
 
   /// players grouped by team, already sorted by position.
   final PlayersData data;
@@ -42,7 +48,9 @@ class TeamsVertical extends StatelessWidget {
   Widget build(BuildContext context) {
     final length = math.max(data.blue.length, data.red.length);
     return ListView(
-      children: [for (int i = 0; i < length; i++) _build(data, i)],
+      children: [
+        for (int i = 0; i < length; i++) _build(data, i),
+      ],
     );
   }
 
@@ -55,7 +63,11 @@ class TeamsVertical extends StatelessWidget {
         children: [
           _buildPlayer(blue),
           const SizedBox(width: 8.0),
-          TeamPowerIndicator(blue: blue, red: red, vertical: true),
+          TeamIndicator(
+            blue: blue,
+            red: red,
+            vertical: true,
+          ),
           const SizedBox(width: 8.0),
           _buildPlayer(red),
         ],
@@ -65,15 +77,19 @@ class TeamsVertical extends StatelessWidget {
 
   Widget _buildPlayer(PlayerData? player) {
     return Expanded(
-      child:
-          player != null ? PlayerCard(data: player) : const SizedBox.shrink(),
+      child: player != null
+          ? PlayerCard(data: player)
+          : const SizedBox.shrink(),
     );
   }
 }
 
 /// Displays teams as rows stacked vertically.
 class TeamsHorizontal extends StatelessWidget {
-  const TeamsHorizontal(this.data, {super.key});
+  const TeamsHorizontal(
+    this.data, {
+    super.key,
+  });
 
   /// players grouped by team, already sorted by position.
   final PlayersData data;
@@ -92,9 +108,10 @@ class TeamsHorizontal extends StatelessWidget {
   }
 }
 
-
 class _TeamRow extends StatelessWidget {
-  const _TeamRow({required this.players});
+  const _TeamRow({
+    required this.players,
+  });
 
   final List<PlayerData> players;
 
@@ -102,13 +119,8 @@ class _TeamRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: List.generate(players.length * 2 - 1, (index) {
-        if (index.isEven) {
-          return _buildPlayer(players[index ~/ 2]);
-        } else {
-          return const SizedBox(width: 16.0);
-        }
-      }),
+      spacing: 16.0,
+      children: [for (final p in players) _buildPlayer(p)],
     );
   }
 
@@ -127,7 +139,11 @@ class _IndicatorRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final length = math.max(data.blue.length, data.red.length);
-    return Row(children: [for (int i = 0; i < length; i++) _build(data, i)]);
+    return Row(
+      children: [
+        for (int i = 0; i < length; i++) _build(data, i),
+      ],
+    );
   }
 
   Widget _build(PlayersData data, int index) {
@@ -135,7 +151,11 @@ class _IndicatorRow extends StatelessWidget {
     final red = data.red.elementAtOrNull(index);
     return Expanded(
       child: Center(
-        child: TeamPowerIndicator(blue: blue, red: red, vertical: false),
+        child: TeamIndicator(
+          blue: blue,
+          red: red,
+          vertical: false,
+        ),
       ),
     );
   }

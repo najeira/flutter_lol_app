@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/game.dart';
 
 class ErrorView extends ConsumerWidget {
-  const ErrorView({super.key, required this.error});
+  const ErrorView({
+    super.key,
+    required this.error,
+  });
 
   final Object error;
 
@@ -12,20 +15,23 @@ class ErrorView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.connecting_airports, size: 48),
-            const SizedBox(height: 12),
+            const Icon(
+              Icons.error_outline,
+              size: 48.0,
+            ),
+            const SizedBox(height: 12.0),
             Text(
               'データの取得に失敗しました。'
-              'Leagueクライアントが起動しており、'
+              '\nLeagueクライアントが起動しており、'
               '試合中であることを確認してください。'
-              '\n\n$error',
+              '\n\n${error}',
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 12.0),
             ElevatedButton.icon(
               onPressed: () {
                 // gameDataProviderを無効化して再取得をトリガー

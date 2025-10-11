@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:collection/collection.dart';
 
 import '../models/item.dart' show Item;
 import '../providers/item.dart';
-import '../providers/player.dart';
-import '../screens/champion_image.dart';
-import '../screens/item_image.dart';
+import '../services/player.dart';
+import 'champion_image.dart';
+import 'item_image.dart';
 
 class PlayerCard extends StatelessWidget {
-  const PlayerCard({super.key, required this.data});
+  const PlayerCard({
+    super.key,
+    required this.data,
+  });
 
   final PlayerData data;
 
@@ -87,7 +89,9 @@ class _Items extends ConsumerWidget {
       crossAxisAlignment: WrapCrossAlignment.end,
       spacing: 2.0,
       runSpacing: 2.0,
-      children: [for (final value in values) ItemIcon(item: value)],
+      children: [
+        for (final value in values) ItemIcon(item: value),
+      ],
     );
   }
 }

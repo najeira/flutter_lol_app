@@ -37,13 +37,11 @@ class ChampionImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseName = _deriveChampionBaseName(player);
-    final assetPath = "assets/champion/${baseName}.png";
     return Image.asset(
-      assetPath,
+      "assets/champion/${baseName}.png",
       width: size,
       height: size,
       fit: BoxFit.fill,
-      filterQuality: FilterQuality.medium,
       errorBuilder: (context, error, stackTrace) {
         return _Placeholder(size: size);
       },
@@ -62,7 +60,7 @@ class _Placeholder extends StatelessWidget {
       alignment: Alignment.center,
       color: Colors.grey.shade300,
       child: Icon(
-        Icons.help_outline,
+        Icons.close,
         size: size * 0.6,
         color: Colors.grey.shade600,
       ),
@@ -86,6 +84,9 @@ extension StringExtension on String {
   }
 
   String toFirstUppercase() {
+    if (isEmpty) {
+      return "";
+    }
     return this[0].toUpperCase() + (length > 1 ? substring(1) : "");
   }
 }
