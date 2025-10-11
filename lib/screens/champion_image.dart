@@ -85,7 +85,7 @@ extension StringExtension on String {
 
   String toFirstUppercase() {
     if (isEmpty) {
-      return "";
+      return this;
     }
     return this[0].toUpperCase() + (length > 1 ? substring(1) : "");
   }

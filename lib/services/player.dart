@@ -26,6 +26,10 @@ List<PlayerData> computePlayersPower(
   AllGameData allGameData,
   ItemMaster itemMaster,
 ) {
+  if (allGameData.allPlayers.isEmpty) {
+    return [];
+  }
+
   // まず全プレイヤーのパワーを計算
   final powers = allGameData.allPlayers
       .map((p) => _computePlayerPower(p, itemMaster))

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 読み込みを開始しておく
-  SharedPreferences.getInstance();
+  unawaited(SharedPreferences.getInstance());
 
   // Window
   await windowManager.ensureInitialized();
