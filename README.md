@@ -51,3 +51,8 @@ A. プレイヤーのレベルと所持しているアイテムの価値を基�
 - このツールは Riot Games の公式製品ではありません。
 - Live Client Data API を利用します。
 - 本ツールの利用は、自己責任でお願いします。
+
+## ライセンス
+
+- ソースコードは GNU General Public License v3 のもとで提供されます。`LICENSE.md` を参照してください。
+- `assets/` 配下の画像や `item.json` は Riot Games の著作物であり、再配布や二次利用は各ファイルの提供元規約に従ってください。
