@@ -1,4 +1,4 @@
-# LoL Live Game Helper (Flutter)
+# Rift Pulse
 
 League of Legends の試合中に、ローカルの Live Client Data API（`https://127.0.0.1:2999`）からデータを取得し、試合の状況把握に役立つ情報（チーム比較、各レーンの優勢/劣勢、チャンピオンやレベル、装備価値ベースの「パワー」など）を表示する Flutter アプリです。
 

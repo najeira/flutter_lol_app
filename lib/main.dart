@@ -17,7 +17,7 @@ void main() async {
   // Window
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
-    const WindowOptions(size: Size(300, 800), title: "LoL Live Helper"),
+    const WindowOptions(size: Size(300, 800), title: "Rift Pulse"),
     _onWindowReady,
   );
 
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'LoL Live Game Helper',
+      title: 'Rift Pulse',
       theme: ThemeData.dark(useMaterial3: true),
       themeMode: ThemeMode.dark,
       home: const LiveGameScreen(),
