@@ -1,6 +1,6 @@
 set dotenv-load := true
 
-app_file := "build/macos/Build/Products/Release/Rift Pulse.app"
+app_file := "build/macos/Build/Products/Release/RiftPulse.app"
 
 default:
   just --list
