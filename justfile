@@ -1,6 +1,6 @@
 set dotenv-load := true
 
-app_file := "build/macos/Build/Products/Release/LoLLiveHelper.app"
+app_file := "build/macos/Build/Products/Release/RiftPulse.app"
 
 default:
   just --list
@@ -36,10 +36,10 @@ verify:
 zip:
   ditto -c -k --sequesterRsrc --keepParent \
     "{{app_file}}" \
-    "LoLLiveHelper.zip"
+    "RiftPulse.zip"
 
 notary:
-  xcrun notarytool submit LoLLiveHelper.zip \
+  xcrun notarytool submit RiftPulse.zip \
     --apple-id "${APPLE_EMAIL_ADDRESS}" \
     --team-id "${APPLE_TEAM_ID}" \
     --password "${APP_SPECIFIC_PASSWORD}" \

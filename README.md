@@ -1,4 +1,4 @@
-# LoL Live Game Helper
+# Rift Pulse
 
 League of Legendsの試合中に、チームやレーンの状況をリアルタイムで分析・表示するmac向けのデスクトップアプリです。
 
