@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/item.dart' show Item;
 import '../providers/item.dart';
 import '../services/player.dart';
+
 import 'champion_image.dart';
 import 'item_image.dart';
+import 'item_tooltip.dart';
 
 class PlayerCard extends StatelessWidget {
   const PlayerCard({
@@ -97,7 +99,11 @@ class _Items extends ConsumerWidget {
         spacing: 2.0,
         runSpacing: 2.0,
         children: [
-          for (final value in values) ItemIcon(item: value),
+          for (final value in values)
+            ItemTooltip(
+              item: value,
+              child: ItemIcon(item: value),
+            ),
         ],
       ),
     );
