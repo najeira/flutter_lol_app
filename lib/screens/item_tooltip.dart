@@ -6,63 +6,115 @@ class ItemDetailPopup extends StatelessWidget {
   const ItemDetailPopup({
     super.key,
     required this.item,
-    this.maxHeight,
   });
 
   final ItemData item;
-  final double? maxHeight;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade700),
-          boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black54)],
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: const BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        border: Border.fromBorderSide(
+          BorderSide(color: Colors.white54),
         ),
-        constraints: BoxConstraints(
-          maxWidth: 300,
-          maxHeight: maxHeight ?? MediaQuery.of(context).size.height * 0.8,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Cost: ${item.gold.total} (${item.gold.base})',
-                style: const TextStyle(color: Colors.yellow, fontSize: 13),
-              ),
-              const Divider(color: Colors.white24),
-              Text(
-                item.plaintext.isNotEmpty
-                    ? item.plaintext
-                    : _stripHtml(item.description),
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 10.0,
+            color: Colors.black54,
           ),
-        ),
+        ],
+      ),
+      constraints: const BoxConstraints(
+        maxWidth: 300.0,
+      ),
+      child: _ItemDetailBody(
+        item: item,
       ),
     );
   }
+}
 
-  String _stripHtml(String html) {
-    return html.replaceAll(RegExp(r'<[^>]*>'), '');
+class _ItemDetailBody extends StatelessWidget {
+  const _ItemDetailBody({
+    super.key,
+    required this.item,
+  });
+
+  final ItemData item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final texts = _stripHtml(item.description);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          item.name,
+          style: theme.textTheme.labelLarge,
+        ),
+        const Divider(
+          height: 12.0,
+          color: Colors.white24,
+        ),
+        for (final text in texts)
+          Padding(
+            padding: _padding(text.kind),
+            child: Text(
+              text.text,
+              style: _textStyle(text.kind, theme.textTheme),
+            ),
+          ),
+      ],
+    );
   }
+
+  static EdgeInsetsGeometry _padding(String kind) {
+    if (kind.startsWith("passive")) {
+      return EdgeInsets.only(top: 8.0);
+    } else if (kind.startsWith("active")) {
+      return EdgeInsets.only(top: 8.0);
+    }
+    return EdgeInsets.zero;
+  }
+
+  static TextStyle? _textStyle(String kind, TextTheme textTheme) {
+    if (kind.startsWith("passive")) {
+      return textTheme.labelMedium?.copyWith(
+        color: Colors.yellowAccent,
+      );
+    } else if (kind.startsWith("active")) {
+      return textTheme.labelMedium?.copyWith(
+        color: Colors.orangeAccent,
+      );
+    }
+
+    if (kind.isNotEmpty) {
+      return textTheme.bodyMedium?.copyWith(
+        color: Colors.greenAccent,
+      );
+    }
+
+    return textTheme.bodyMedium?.copyWith(
+      height: 1.2,
+    );
+  }
+}
+
+class _ItemText {
+  const _ItemText({
+    required this.text,
+    required this.kind,
+  });
+
+  final String text;
+  final String kind;
 }
 
 class ItemTooltip extends StatefulWidget {
@@ -100,41 +152,42 @@ class _ItemTooltipState extends State<ItemTooltip> {
             final targetOffset =
                 renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
 
-            final targetWidth = renderBox?.size.width ?? 0;
-            final targetHeight = renderBox?.size.height ?? 0;
-            final targetCenterX = targetOffset.dx + targetWidth / 2;
+            final targetWidth = renderBox?.size.width ?? 0.0;
+            final targetHeight = renderBox?.size.height ?? 0.0;
+            final targetCenterX = targetOffset.dx + targetWidth / 2.0;
 
+            // スペースの広い方に表示する
             final spaceBelow =
                 screenSize.height - (targetOffset.dy + targetHeight);
-
-            // maxHeightの計算（上下に8pxずつの余白、計16pxを確保）
-            final maxHeight = spaceBelow - 16.0;
+            final showBelow = spaceBelow > targetOffset.dy;
 
             // 水平方向の調整
-            // 理想的な位置はターゲットの中央
-            final popupWidth = 300.0.clamp(0.0, screenSize.width - 16);
-            final idealLeft = targetCenterX - popupWidth / 2;
+            final maxWidth = screenSize.width - 16.0;
+            final popupWidth = 300.0.clamp(0.0, maxWidth);
+            final idealLeft = targetCenterX - (popupWidth / 2.0);
 
-            // 画面の端から8pxの余白を確保するようにクランプ
+            // 画面の端から8pxの余白を確保するようにクランプ（水平方向のみ）
             final actualLeft = idealLeft.clamp(
               8.0,
               screenSize.width - popupWidth - 8.0,
             );
 
-            // followerAnchorをtopLeft、targetAnchorをtopLeftとした時の
-            // targetOffset.dxに対する相対的なオフセットを計算
-            final horizontalOffset = actualLeft - targetOffset.dx;
+            final offsetX = actualLeft - targetOffset.dx;
+            final offsetY = showBelow ? 8.0 : -8.0;
 
             return Positioned(
               width: popupWidth,
               child: CompositedTransformFollower(
                 link: _link,
-                targetAnchor: Alignment.topLeft,
-                followerAnchor: Alignment.bottomLeft,
-                offset: Offset(horizontalOffset, -8.0),
+                targetAnchor: showBelow
+                    ? Alignment.bottomLeft
+                    : Alignment.topLeft,
+                followerAnchor: showBelow
+                    ? Alignment.topLeft
+                    : Alignment.bottomLeft,
+                offset: Offset(offsetX, offsetY),
                 child: ItemDetailPopup(
                   item: widget.item,
-                  maxHeight: maxHeight,
                 ),
               ),
             );
@@ -144,4 +197,66 @@ class _ItemTooltipState extends State<ItemTooltip> {
       ),
     );
   }
+}
+
+final _htmlRegExp = RegExp(r'<[^>]*>');
+
+final _stripHtmlCache = <String, List<_ItemText>>{};
+
+List<_ItemText> _stripHtml(String html) {
+  return _stripHtmlCache.putIfAbsent(
+    html,
+    () => _parseHtml(html),
+  );
+}
+
+List<_ItemText> _parseHtml(String html) {
+  final texts = <_ItemText>[];
+
+  final sections = html.split("<br>");
+
+  bool stats = true;
+  for (final section in sections) {
+    if (section.isEmpty) {
+      stats = false;
+      continue;
+    }
+
+    if (stats) {
+      final text = section.replaceAll(_htmlRegExp, " ").trim();
+      final parts = text.split(" ");
+      final kind = parts.length >= 2 ? parts[0] : "";
+      texts.add(
+        _ItemText(
+          text: text,
+          kind: kind,
+        ),
+      );
+    } else {
+      final text = section.replaceAll(_htmlRegExp, "").trim();
+      if (section.endsWith("</passive>")) {
+        texts.add(
+          _ItemText(
+            text: text,
+            kind: "passive",
+          ),
+        );
+      } else if (section.startsWith("</active>")) {
+        texts.add(
+          _ItemText(
+            text: text,
+            kind: "active",
+          ),
+        );
+      } else if (text.isNotEmpty) {
+        texts.add(
+          _ItemText(
+            text: text,
+            kind: "",
+          ),
+        );
+      }
+    }
+  }
+  return texts;
 }
