@@ -78,8 +78,6 @@ class _Items extends ConsumerWidget {
         return null;
       } else if (data.consumed) {
         return null;
-      } else if (!data.inStore) {
-        return null;
       } else if (data.gold.total <= 0) {
         return null;
       } else if (data.tags.contains("Consumable")) {
