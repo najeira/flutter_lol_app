@@ -44,3 +44,6 @@ notary:
 
 staple:
   xcrun stapler staple {{app_file}}
+
+all:
+  just build && just sign && just verify && just zip && just notary && just staple
