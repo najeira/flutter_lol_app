@@ -154,45 +154,84 @@ class _ItemTooltipState extends State<ItemTooltip> {
 
             final targetWidth = renderBox?.size.width ?? 0.0;
             final targetHeight = renderBox?.size.height ?? 0.0;
-            final targetCenterX = targetOffset.dx + targetWidth / 2.0;
+
+            final targetRight = targetOffset.dx + targetWidth;
+            final targetBottom = targetOffset.dy + targetHeight;
+
+            final popupMaxWidth = screenSize.width - 16.0;
+            final popupWidth = 300.0.clamp(0.0, popupMaxWidth);
+
+            // ウィンドウが横長の場合は左右に表示する
+            if (screenSize.width > screenSize.height) {
+              final spaceRight = screenSize.width - targetRight;
+              final showRight = spaceRight > targetOffset.dx;
+              final sideBottom = targetOffset.dy > screenSize.height / 2.0;
+              final offsetX = showRight ? 8.0 : -8.0;
+              final offsetY = sideBottom ? targetHeight : 0.0;
+              return _build(
+                width: popupWidth,
+                targetAnchor: showRight
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                followerAnchor: showRight
+                    ? (sideBottom ? Alignment.bottomLeft : Alignment.centerLeft)
+                    : (sideBottom
+                          ? Alignment.bottomRight
+                          : Alignment.centerRight),
+                offset: Offset(offsetX, offsetY),
+              );
+            }
 
             // スペースの広い方に表示する
-            final spaceBelow =
-                screenSize.height - (targetOffset.dy + targetHeight);
+            final spaceBelow = screenSize.height - targetBottom;
             final showBelow = spaceBelow > targetOffset.dy;
 
             // 水平方向の調整
-            final maxWidth = screenSize.width - 16.0;
-            final popupWidth = 300.0.clamp(0.0, maxWidth);
-            final idealLeft = targetCenterX - (popupWidth / 2.0);
+            // ポップアップが画面外にでないようにオフセットを計算する
+            final popupWidthHalf = popupWidth / 2.0;
 
-            // 画面の端から8pxの余白を確保するようにクランプ（水平方向のみ）
-            final actualLeft = idealLeft.clamp(
-              8.0,
-              screenSize.width - popupWidth - 8.0,
-            );
+            final overLeft = targetOffset.dx - popupWidthHalf;
+            final overRight =
+                targetOffset.dx + popupWidthHalf - screenSize.width;
 
-            final offsetX = actualLeft - targetOffset.dx;
+            final actualLeft = overLeft < 8.0 ? (8.0 - overLeft) : null;
+            final actualRight = overRight > -8.0 ? (-8.0 - overRight) : null;
+
+            final offsetX = actualLeft ?? actualRight ?? 0.0;
             final offsetY = showBelow ? 8.0 : -8.0;
 
-            return Positioned(
+            return _build(
               width: popupWidth,
-              child: CompositedTransformFollower(
-                link: _link,
-                targetAnchor: showBelow
-                    ? Alignment.bottomLeft
-                    : Alignment.topLeft,
-                followerAnchor: showBelow
-                    ? Alignment.topLeft
-                    : Alignment.bottomLeft,
-                offset: Offset(offsetX, offsetY),
-                child: ItemDetailPopup(
-                  item: widget.item,
-                ),
-              ),
+              targetAnchor: showBelow
+                  ? Alignment.bottomLeft
+                  : Alignment.topLeft,
+              followerAnchor: showBelow
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
+              offset: Offset(offsetX, offsetY),
             );
           },
           child: widget.child,
+        ),
+      ),
+    );
+  }
+
+  Widget _build({
+    required double width,
+    required Alignment targetAnchor,
+    required Alignment followerAnchor,
+    required Offset offset,
+  }) {
+    return Positioned(
+      width: width,
+      child: CompositedTransformFollower(
+        link: _link,
+        targetAnchor: targetAnchor,
+        followerAnchor: followerAnchor,
+        offset: offset,
+        child: ItemDetailPopup(
+          item: widget.item,
         ),
       ),
     );
