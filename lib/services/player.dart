@@ -144,6 +144,8 @@ const _levelScores = <int>[
   7250,
   7650,
   8050,
+  8450,
+  8850,
 ];
 
 double _deviation(int score, double mean, double stddev) {
