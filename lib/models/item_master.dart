@@ -29,8 +29,11 @@ class ItemMaster {
     final parsed = <int, ItemData>{};
     for (final entry in rawData.entries) {
       final id = int.tryParse(entry.key);
-      if (id != null && entry.value is Map) {
-        parsed[id] = ItemData.fromJson(asMap(entry.value));
+      if (id != null) {
+        final itemMap = asMap(entry.value);
+        if (itemMap.isNotEmpty) {
+          parsed[id] = ItemData.fromJson(itemMap);
+        }
       }
     }
     return ItemMaster(
